@@ -67,8 +67,8 @@ flowchart TD
     H --> I[Logout]
 
     %% Admin Flow
-    G --> J[Kelola Produk (CRUD)]
-    G --> K[Kelola Pesanan (CRUD)]
+    G --> J["Kelola Produk (CRUD)"]
+    G --> K["Kelola Pesanan (CRUD)"]
     K --> L[Update Status Pesanan]
     L --> I[Logout]
 ```
@@ -161,7 +161,14 @@ Tabel dan field (Supabase):
 
 ER Diagram (gambar)
 
-![ER Diagram - BahanKu](img/database_schema_bahanku.png)
+```mermaid
+erDiagram
+    users ||--o{ orders : "melakukan"
+    orders ||--|{ order_items : "memiliki"
+    products ||--o{ order_items : "dipesan dalam"
+    recipes ||--o{ recipe_products : "terdiri dari"
+    products ||--o{ recipe_products : "menjadi bahan dari"
+```
 
 ## 7. Teknologi
 - Frontend: React Native (Expo)
