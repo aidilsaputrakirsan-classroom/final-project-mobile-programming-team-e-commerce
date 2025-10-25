@@ -15,17 +15,17 @@ Penanggung jawab: (Pangeran) | (Adam)
 - [Telah Dibuat] Buat struktur folder utama (app, src, dll) (Pangeran)
 - [Telah Dibuat] Konfigurasi alias path "@" di tsconfig.json (Pangeran)
 - [Telah Dibuat] Setup .env dan tambahkan ke gitignore (Pangeran)
-- [Sedang Dikerjakan] Tes build awal dengan Expo Go di Android dan iOS (Pangeran)
+- [Telah Dibuat] Tes build awal dengan Expo Go di Android dan iOS (Pangeran)
 
 ---
 
 ## 2. Konfigurasi Dasar
 
-- [Belum Dibuat] Buat file supabase.client.ts (Pangeran)
-- [Belum Dibuat] Tambahkan konfigurasi auth Supabase (persist session AsyncStorage) (Pangeran)
-- [Belum Dibuat] Siapkan tema global (warna, font, spacing) (Adam)
-- [Belum Dibuat] Tambahkan util formatCurrency() di libs/currency.ts (Shared)
-- [Belum Dibuat] Buat komponen EmptyState dan ProductCard (Adam)
+- [Telah Dibuat] Buat file supabase.client.ts (Pangeran)
+- [Telah Dibuat] Tambahkan konfigurasi auth Supabase (persist session AsyncStorage) (Pangeran)
+- [Telah Dibuat] Siapkan tema global (warna, font, spacing) (Adam)
+- [Telah Dibuat] Tambahkan util formatCurrency() di libs/currency.ts (Shared)
+- [Telah Dibuat] Buat komponen EmptyState dan ProductCard (Adam)
 
 ---
 
