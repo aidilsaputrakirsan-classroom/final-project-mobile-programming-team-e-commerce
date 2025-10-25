@@ -72,7 +72,7 @@ src/
 
 ## Tracking Pekerjaan
 
-- Sebelum mulai mengerjakan kode, Copilot wajib membaca file bernama "Development Checklist" di root proyek. File tersebut digunakan untuk melacak setiap langkah pekerjaan dan statusnya.
+- Sebelum mulai mengerjakan kode, Copilot wajib membaca file bernama "Development_Checklist_BahanKu.md" di root proyek. File tersebut digunakan untuk melacak setiap langkah pekerjaan dan statusnya.
 - Contoh:
   Jika sebelumnya: [Belum Dibuat] Buat hook useAuth  
    Setelah selesai, ubah menjadi: [Telah Dibuat] Buat hook useAuth
@@ -88,5 +88,3 @@ src/
 ```ts
 // TODO: klarifikasi bagian ini (Bahasa Indonesia)
 ```
-
-Gaya penulisan harus natural dan mudah dibaca seperti dokumentasi proyek GitHub, tanpa emoji atau karakter tebal.
