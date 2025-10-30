@@ -31,11 +31,11 @@ Penanggung jawab: (Pangeran) | (Adam)
 
 ## 3. Autentikasi
 
-- [Belum Dibuat] Buat hook useAuth (login, register, logout, Google Sign-In) (Pangeran)
-- [Belum Dibuat] Halaman login.tsx (Adam)
-- [Belum Dibuat] Halaman register.tsx (Adam)
-- [Belum Dibuat] Persist sesi login ke AsyncStorage (Pangeran)
-- [Belum Dibuat] Router guard untuk halaman (auth) (Pangeran)
+- [Telah Dibuat] Buat hook useAuth (login, register, logout, Google Sign-In) (Pangeran)
+- [Telah Dibuat] Halaman login.tsx (Adam)
+- [Telah Dibuat] Halaman register.tsx (Adam)
+- [Telah Dibuat] Persist sesi login ke AsyncStorage (Pangeran)
+- [Telah Dibuat] Router guard untuk halaman (auth) (Pangeran)
 
 ---
 

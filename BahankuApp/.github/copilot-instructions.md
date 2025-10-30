@@ -101,4 +101,63 @@ src/
 // TODO: klarifikasi bagian ini (Bahasa Indonesia)
 ```
 
+## Command Terminal untuk PowerShell Windows
+
+- User menggunakan PowerShell Windows sebagai shell default
+- SELALU pastikan user berada di folder `BahankuApp` sebelum menjalankan command instalasi atau build
+- JANGAN langsung jalankan command instalasi tanpa navigasi ke folder yang benar
+- Format command PowerShell:
+  - Untuk pindah direktori: `cd BahankuApp` (BUKAN `cd BahankuApp &&`)
+  - Untuk multiple command: gunakan `;` (BUKAN `&&`)
+  - Contoh: `cd BahankuApp; npm install`
+
+### Template Command yang Benar
+
+```powershell
+# BENAR - Untuk PowerShell Windows
+cd BahankuApp
+npm install
+
+# ATAU dengan semicolon
+cd BahankuApp; npm install
+
+# SALAH - Jangan gunakan && di PowerShell
+cd BahankuApp && npm install  # ❌ SALAH
+```
+
+### Instruksi Navigasi Folder
+
+Sebelum memberikan command instalasi atau build:
+1. Pastikan working directory saat ini dengan menyebutkan: "Pastikan Anda berada di folder `BahankuApp`"
+2. Berikan instruksi navigasi eksplisit jika perlu
+3. Format command harus sesuai PowerShell Windows
+
+Contoh instruksi yang benar:
+```
+Jalankan command berikut di PowerShell:
+
+# 1. Pindah ke folder BahankuApp (jika belum)
+cd BahankuApp
+
+# 2. Install dependencies
+npm install --legacy-peer-deps
+
+# 3. Start aplikasi
+npx expo start -c
+```
+
+### Cek Dependency Sebelum Install
+
+Sebelum menyarankan `npm install`, SELALU cek dulu apakah dependency sudah lengkap:
+
+```powershell
+# Cek dependency yang terinstall
+npm ls --depth=0
+
+# Atau simulasi install tanpa benar-benar install
+npm install --dry-run
+```
+
+Jika output clean tanpa error "missing" atau "UNMET DEPENDENCY", berarti tidak perlu install lagi.
+
 Gaya penulisan harus natural dan mudah dibaca seperti dokumentasi proyek GitHub, tanpa emoji atau karakter tebal.
