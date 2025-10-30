@@ -70,6 +70,18 @@ src/
 - Setiap pull request harus menyertakan deskripsi singkat dan langkah uji manual.
 - Reviewer utama untuk setiap PR adalah Pangeran (PBS).
 
+## Dependensi Utama
+
+- expo
+- react-native
+- expo-router
+- zustand
+- @react-native-async-storage/async-storage
+- @supabase/supabase-js
+- react-hook-form
+- zod
+- react-native-vector-icons
+
 ## Tracking Pekerjaan
 
 - Sebelum mulai mengerjakan kode, Copilot wajib membaca file bernama "Development Checklist" di root proyek. File tersebut digunakan untuk melacak setiap langkah pekerjaan dan statusnya.
