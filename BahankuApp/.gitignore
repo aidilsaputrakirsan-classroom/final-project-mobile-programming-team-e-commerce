@@ -39,3 +39,11 @@ AGENTS.md
 # generated native folders
 /ios
 /android
+
+# Local guidance files - do not commit
+AUTH_README.md
+DATABASE_SETUP.md
+DEPENDENCY_CHECK.md
+EMAIL_SETUP.md
+FIX_IOS_ANDROID.md
+TROUBLESHOOTING.md
