@@ -41,9 +41,9 @@ Penanggung jawab: (Pangeran) | (Adam)
 
 ## 4. Produk
 
-- [Belum Dibuat] Hook useProducts (list, getById, create, update, delete) (Adam)
-- [Belum Dibuat] Halaman home.tsx (list produk, search, filter kategori) (Adam)
-- [Belum Dibuat] Halaman detail produk [id].tsx (Adam)
+- [Telah Dibuat] Hook useProducts (list, getById, create, update, delete) (Adam)
+- [Telah Dibuat] Halaman home.tsx (list produk, search, filter kategori) (Adam)
+- [Sedang Dikerjakan] Halaman detail produk [id].tsx (Adam)
 - [Belum Dibuat] Integrasi Supabase Storage untuk gambar produk (Adam)
 
 ---
@@ -87,7 +87,7 @@ Penanggung jawab: (Pangeran) | (Adam)
 
 ## 9. Pengaturan & Profil
 
-- [Belum Dibuat] Halaman profile.tsx (tampil nama, email, tombol logout) (Adam)
+- [Telah Dibuat] Halaman profile.tsx (tampil nama, email, tombol logout) (Adam)
 - [Belum Dibuat] Tambahkan toggle dark mode di ui.store.ts (Pangeran)
 
 ---
