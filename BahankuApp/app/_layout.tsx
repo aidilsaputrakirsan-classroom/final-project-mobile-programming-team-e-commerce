@@ -22,7 +22,7 @@ export default function RootLayout() {
       // Redirect ke tabs jika sudah login
       router.replace('/(tabs)');
     }
-  }, [isAuthenticated, initializing, segments]);
+  }, [isAuthenticated, initializing, segments, router]);
 
   if (initializing) {
     return (

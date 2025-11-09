@@ -177,9 +177,10 @@ export const useAuth = () => {
       }
 
       return { success: true };
-    } catch (error: any) {
-      Alert.alert('Login Gagal', error.message);
-      return { success: false, error: error.message };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Login gagal';
+      Alert.alert('Login Gagal', errorMessage);
+      return { success: false, error: errorMessage };
     } finally {
       setLoading(false);
     }
@@ -228,9 +229,10 @@ export const useAuth = () => {
       );
 
       return { success: true };
-    } catch (error: any) {
-      Alert.alert('Registrasi Gagal', error.message);
-      return { success: false, error: error.message };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Registrasi gagal';
+      Alert.alert('Registrasi Gagal', errorMessage);
+      return { success: false, error: errorMessage };
     } finally {
       setLoading(false);
     }
@@ -247,9 +249,10 @@ export const useAuth = () => {
       );
 
       return { success: false, error: 'Feature not configured' };
-    } catch (error: any) {
-      Alert.alert('Login Google Gagal', error.message);
-      return { success: false, error: error.message };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Login Google gagal';
+      Alert.alert('Login Google Gagal', errorMessage);
+      return { success: false, error: errorMessage };
     }
   };
 
@@ -265,9 +268,10 @@ export const useAuth = () => {
 
       logoutStore();
       return { success: true };
-    } catch (error: any) {
-      Alert.alert('Logout Gagal', error.message);
-      return { success: false, error: error.message };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Logout gagal';
+      Alert.alert('Logout Gagal', errorMessage);
+      return { success: false, error: errorMessage };
     } finally {
       setLoading(false);
     }

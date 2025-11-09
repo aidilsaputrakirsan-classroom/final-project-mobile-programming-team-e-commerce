@@ -42,8 +42,9 @@ export default function TestTodoScreen() {
 
       if (error) throw error;
       setTodos(data || []);
-    } catch (error: any) {
-      Alert.alert('Error', error.message);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan';
+      Alert.alert('Error', errorMessage);
     } finally {
       setRefreshing(false);
     }
@@ -57,7 +58,7 @@ export default function TestTodoScreen() {
 
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('todos')
         .insert([
           {
@@ -73,8 +74,9 @@ export default function TestTodoScreen() {
       setDescription('');
       fetchTodos();
       Alert.alert('Success', 'Todo berhasil ditambahkan!');
-    } catch (error: any) {
-      Alert.alert('Error', error.message);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan';
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -89,8 +91,9 @@ export default function TestTodoScreen() {
 
       if (error) throw error;
       fetchTodos();
-    } catch (error: any) {
-      Alert.alert('Error', error.message);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan';
+      Alert.alert('Error', errorMessage);
     }
   };
 
@@ -101,8 +104,9 @@ export default function TestTodoScreen() {
       if (error) throw error;
       fetchTodos();
       Alert.alert('Success', 'Todo berhasil dihapus!');
-    } catch (error: any) {
-      Alert.alert('Error', error.message);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan';
+      Alert.alert('Error', errorMessage);
     }
   };
 
