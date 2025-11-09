@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
+import { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+
 import { useAuth } from '@/hooks/useAuth';
 import { theme } from '@/theme';
 

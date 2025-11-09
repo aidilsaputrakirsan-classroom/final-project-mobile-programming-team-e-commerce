@@ -1,3 +1,5 @@
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { ShoppingCart, Minus, Plus } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -8,11 +10,10 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ShoppingCart, Minus, Plus } from 'lucide-react-native';
+
 import { useProducts } from '@/hooks/useProducts';
-import { theme } from '@/theme';
 import { formatCurrency } from '@/libs/currency';
+import { theme } from '@/theme';
 import { Product } from '@/types/product';
 
 export default function ProductDetailScreen() {

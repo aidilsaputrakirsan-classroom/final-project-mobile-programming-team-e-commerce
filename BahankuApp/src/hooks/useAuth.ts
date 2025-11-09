@@ -1,7 +1,9 @@
+import { AuthApiError } from '@supabase/supabase-js';
 import { useState, useEffect, useCallback } from 'react';
 import { Alert } from 'react-native';
-import { AuthApiError } from '@supabase/supabase-js';
+
 import { supabase } from '@/services/supabase.client';
+
 import { useAuthStore } from '@/store/auth.store';
 import { LoginCredentials, RegisterCredentials, User } from '@/types/auth';
 
@@ -69,7 +71,9 @@ export const useAuth = () => {
 
         if (authError) {
           if (isInvalidRefreshToken(authError)) {
-            console.warn('Refresh token tidak valid saat mengambil user, membersihkan sesi.');
+            console.warn(
+              'Refresh token tidak valid saat mengambil user, membersihkan sesi.',
+            );
             await clearAuthSession();
           } else {
             console.error('Error Supabase getUser:', authError);
@@ -90,7 +94,7 @@ export const useAuth = () => {
         console.error('Error loading user profile:', error);
       }
     },
-    [clearAuthSession, setUser]
+    [clearAuthSession, setUser],
   );
 
   useEffect(() => {
@@ -220,7 +224,7 @@ export const useAuth = () => {
       Alert.alert(
         'Registrasi Berhasil',
         'Silakan cek email Anda untuk verifikasi akun. Setelah verifikasi, Anda bisa login.',
-        [{ text: 'OK' }]
+        [{ text: 'OK' }],
       );
 
       return { success: true };
@@ -239,7 +243,7 @@ export const useAuth = () => {
       Alert.alert(
         'Google Sign-In Belum Tersedia',
         'Fitur Google Sign-In memerlukan konfigurasi tambahan di Supabase Dashboard dan Google Cloud Console. Silakan gunakan email dan password untuk sementara.',
-        [{ text: 'OK' }]
+        [{ text: 'OK' }],
       );
 
       return { success: false, error: 'Feature not configured' };

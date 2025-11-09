@@ -9,6 +9,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+
 import { supabase } from '../src/services/supabase.client';
 
 interface Todo {

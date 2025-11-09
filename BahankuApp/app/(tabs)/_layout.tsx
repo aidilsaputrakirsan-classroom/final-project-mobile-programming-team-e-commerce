@@ -1,7 +1,8 @@
 import { Tabs } from 'expo-router';
+import { Home, ShoppingCart, ClipboardList, User } from 'lucide-react-native';
 import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Home, ShoppingCart, ClipboardList, User } from 'lucide-react-native';
+
 import { theme } from '@/theme';
 
 export default function TabsLayout() {

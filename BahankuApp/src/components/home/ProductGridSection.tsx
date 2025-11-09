@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { ProductCard } from '@/components/ProductCard';
+
 import { EmptyState } from '@/components/EmptyState';
+import { ProductCard } from '@/components/ProductCard';
 import { theme } from '@/theme';
 import { Product } from '@/types/product';
 
