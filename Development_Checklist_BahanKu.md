@@ -87,7 +87,7 @@ Penanggung jawab: (Pangeran) | (Adam)
 
 ## 9. Pengaturan & Profil
 
-- [Belum Dibuat] Halaman profile.tsx (tampil nama, email, tombol logout) (Adam)
+- [Telah Dibuat] Halaman profile.tsx (tampil nama, email, tombol logout) (Adam)
 - [Belum Dibuat] Tambahkan toggle dark mode di ui.store.ts (Pangeran)
 
 ---

@@ -14,8 +14,6 @@ import { Link } from 'expo-router';
 import {
   Search,
   ShoppingCart,
-  Heart,
-  Plus,
   Leaf,
   Apple,
   Beef,
@@ -24,10 +22,7 @@ import {
   Milk,
 } from 'lucide-react-native';
 import { useProducts, type Product } from '@/hooks/useProducts';
-import { formatCurrency } from '@/libs/currency';
-
-const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - 48) / 2;
+import { ProductCard } from '@/components/ProductCard';
 
 // Data Kategori
 const CATEGORIES = [
@@ -39,43 +34,7 @@ const CATEGORIES = [
   { id: '6', name: 'Susu', icon: Milk, color: '#00BCD4' },
 ];
 
-// Product Card Component
-function ProductCard({ product, onClick }: { product: Product; onClick: () => void }) {
-  const [isFavorite, setIsFavorite] = useState(false);
-  const isLowStock = product.stock < 10;
 
-  return (
-    <TouchableOpacity onPress={onClick} style={styles.productCard}>
-      <View style={styles.productImageContainer}>
-        <Text style={styles.productEmoji}>{product.image}</Text>
-        <TouchableOpacity
-          onPress={() => setIsFavorite(!isFavorite)}
-          style={styles.favoriteButton}
-        >
-          <Heart size={16} color={isFavorite ? '#EF4444' : '#999'} fill={isFavorite ? '#EF4444' : 'none'} />
-        </TouchableOpacity>
-        {isLowStock && (
-          <View style={styles.lowStockBadge}>
-            <Text style={styles.lowStockText}>Stok Terbatas</Text>
-          </View>
-        )}
-      </View>
-      <View style={styles.productInfo}>
-        <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
-        <Text style={styles.productCategory}>{product.category}</Text>
-        <View style={styles.productBottom}>
-          <View>
-            <Text style={styles.productPrice}>{formatCurrency(product.price)}</Text>
-            <Text style={styles.productStock}>Stok: {product.stock}</Text>
-          </View>
-          <TouchableOpacity style={styles.addButton}>
-            <Plus size={16} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-}
 
 export default function HomeScreen() {
   const { getProducts, loading, error } = useProducts();
@@ -180,8 +139,12 @@ export default function HomeScreen() {
                 {filteredProducts.map((product) => (
                   <ProductCard
                     key={product.id}
-                    product={product}
-                    onClick={() => {
+                    id={product.id}
+                    name={product.name}
+                    price={product.price}
+                    stock={product.stock}
+                    image_url={product.image}
+                    onPress={() => {
                       // TODO: Navigasi ke halaman detail produk
                     }}
                   />
@@ -303,89 +266,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 12,
     marginBottom: 24,
-  },
-  productCard: {
-    width: CARD_WIDTH,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  productImageContainer: {
-    height: 120,
-    backgroundColor: '#F0FDF4',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  productEmoji: {
-    fontSize: 48,
-  },
-  favoriteButton: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  lowStockBadge: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    backgroundColor: '#F59E0B',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  lowStockText: {
-    color: '#fff',
-    fontSize: 10,
-    fontWeight: '600',
-  },
-  productInfo: {
-    padding: 12,
-  },
-  productName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 4,
-    height: 36,
-  },
-  productCategory: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginBottom: 8,
-  },
-  productBottom: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  productPrice: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#059669',
-  },
-  productStock: {
-    fontSize: 11,
-    color: '#9CA3AF',
-    marginTop: 2,
-  },
-  addButton: {
-    backgroundColor: '#7FBA3C',
-    borderRadius: 20,
-    padding: 8,
   },
   loadingContainer: {
     padding: 20,
