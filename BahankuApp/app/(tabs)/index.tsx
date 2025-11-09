@@ -1,54 +1,110 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { useProducts } from '@/hooks/useProducts';
 import { useAuth } from '@/hooks/useAuth';
+import { theme } from '@/theme';
+import { Product } from '@/types/product';
+import {
+  BrandHeader,
+  SearchBar,
+  CategoryFilter,
+  PromoBanner,
+  QuickActions,
+  ProductGridSection,
+  RecommendationsSection,
+} from '@/components/home';
 
 export default function HomeScreen() {
-  const { user, logout } = useAuth();
+  const router = useRouter();
+  const { user } = useAuth();
+  const { products, isLoading, error, fetchProducts } = useProducts();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const handleLogout = async () => {
-    await logout();
+  const categories = [
+    { label: 'Semua', value: 'all' },
+    { label: 'Sayur', value: 'sayur' },
+    { label: 'Daging', value: 'daging' },
+    { label: 'Bumbu', value: 'bumbu' },
+    { label: 'Buah', value: 'buah' },
+  ];
+
+  const filteredProducts = React.useMemo(() => {
+    if (selectedCategory === 'all') return products;
+    return products.filter(
+      (product) => product.category?.toLowerCase() === selectedCategory.toLowerCase(),
+    );
+  }, [products, selectedCategory]);
+
+  const handleSearch = async () => {
+    await fetchProducts({ search: searchQuery });
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await fetchProducts();
+    setIsRefreshing(false);
+  };
+
+  const handleProductPress = (product: Product) => {
+    router.push(`/product/${product.id}`);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Selamat Datang di BahanKu</Text>
-      <Text style={styles.subtitle}>Halo, {user?.name || user?.email}</Text>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            colors={[theme.colors.primary]}
+          />
+        }
+        showsVerticalScrollIndicator={false}
+      >
+        <BrandHeader userName={user?.email} />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogout}>
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
-    </View>
+        <SearchBar
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          onSubmit={handleSearch}
+        />
+
+        <CategoryFilter
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+        />
+
+        <PromoBanner />
+
+        <QuickActions />
+
+        <ProductGridSection
+          isLoading={isLoading}
+          error={error}
+          products={filteredProducts}
+          onProductPress={handleProductPress}
+          onRetry={handleRefresh}
+        />
+
+        <RecommendationsSection products={products} onProductPress={handleProductPress} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 32,
-  },
-  button: {
-    backgroundColor: '#f44336',
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    backgroundColor: '#FFFFFF',
   },
 });
