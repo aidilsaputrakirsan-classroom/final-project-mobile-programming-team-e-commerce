@@ -104,3 +104,19 @@ src/
 ```ts
 // TODO: klarifikasi bagian ini (Bahasa Indonesia)
 ```
+
+## Organize UI - Komponen Modular
+
+Saat development berlangsung, pecah UI yang kompleks menjadi komponen-komponen kecil untuk menghindari TSX yang terlalu nested.
+
+Bahkan dalam satu halaman (route), jangan ragu membuat file tambahan yang lebih kecil agar halaman lebih maintainable.
+
+Memecah komponen besar menjadi beberapa file akan sangat membantu ketika user meminta perubahan atau refactor di masa depan.
+
+### Panduan Komponen:
+
+- Satu komponen maksimal 200 baris kode
+- Jika JSX sudah nested lebih dari 4 level, pertimbangkan ekstrak jadi komponen baru
+- Simpan komponen terkait dalam folder yang sama (misal: `components/home/` untuk komponen khusus homepage)
+- Gunakan nama file yang deskriptif (misal: `SearchBar.tsx`, `CategoryFilter.tsx`)
+- Export komponen dengan named export agar mudah di-import
