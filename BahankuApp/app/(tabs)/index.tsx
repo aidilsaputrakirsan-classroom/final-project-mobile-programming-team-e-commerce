@@ -1,11 +1,8 @@
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { useProducts } from '@/hooks/useProducts';
-import { useAuth } from '@/hooks/useAuth';
-import { theme } from '@/theme';
-import { Product } from '@/types/product';
+
 import {
   BrandHeader,
   SearchBar,
@@ -15,6 +12,10 @@ import {
   ProductGridSection,
   RecommendationsSection,
 } from '@/components/home';
+import { useAuth } from '@/hooks/useAuth';
+import { useProducts } from '@/hooks/useProducts';
+import { theme } from '@/theme';
+import { Product } from '@/types/product';
 
 export default function HomeScreen() {
   const router = useRouter();

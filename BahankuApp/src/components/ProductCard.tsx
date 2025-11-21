@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
-import { theme } from '@/theme';
+
 import { formatCurrency } from '@/libs/currency';
+import { theme } from '@/theme';
 
 interface ProductCardProps {
   id: string;

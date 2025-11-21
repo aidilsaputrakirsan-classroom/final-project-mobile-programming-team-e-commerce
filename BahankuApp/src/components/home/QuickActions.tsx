@@ -1,6 +1,7 @@
+import { BookOpen, Zap, Star, Percent, LucideIcon } from 'lucide-react-native';
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { BookOpen, Zap, Star, Percent, LucideIcon } from 'lucide-react-native';
+
 import { theme } from '@/theme';
 
 interface ActionItem {

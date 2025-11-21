@@ -1,3 +1,4 @@
+import { ChevronRight } from 'lucide-react-native';
 import React from 'react';
 import {
   View,
@@ -7,7 +8,7 @@ import {
   Image,
   StyleSheet,
 } from 'react-native';
-import { ChevronRight } from 'lucide-react-native';
+
 import { theme } from '@/theme';
 import { Product } from '@/types/product';
 

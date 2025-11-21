@@ -10,7 +10,7 @@ export interface UploadImageResult {
 // Upload gambar ke Supabase Storage
 export async function uploadProductImage(
   uri: string,
-  productId: string
+  productId: string,
 ): Promise<UploadImageResult | null> {
   try {
     // Konversi URI ke blob

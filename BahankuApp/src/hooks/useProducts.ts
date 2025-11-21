@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
+
 import { supabase } from '@/services/supabase.client';
+
 import {
   Product,
   CreateProductInput,
@@ -96,33 +98,35 @@ export function useProducts(options: UseProductsOptions = {}) {
   }, []);
 
   // Buat produk baru (admin only)
-  const createProduct = useCallback(async (input: CreateProductInput) => {
-    setIsLoading(true);
-    setError(null);
+  const createProduct = useCallback(
+    async (input: CreateProductInput) => {
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const { data, error: createError } = await supabase
-        .from('products')
-        .insert([input])
-        .select()
-        .single();
+      try {
+        const { data, error: createError } = await supabase
+          .from('products')
+          .insert([input])
+          .select()
+          .single();
 
-      if (createError) throw createError;
+        if (createError) throw createError;
 
-      // Refresh list produk
-      await fetchProducts();
+        // Refresh list produk
+        await fetchProducts();
 
-      return data as Product;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Gagal membuat produk';
-      setError(errorMessage);
-      console.error('Error creating product:', err);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [fetchProducts]);
+        return data as Product;
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Gagal membuat produk';
+        setError(errorMessage);
+        console.error('Error creating product:', err);
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [fetchProducts],
+  );
 
   // Update produk (admin only)
   const updateProduct = useCallback(
@@ -154,7 +158,7 @@ export function useProducts(options: UseProductsOptions = {}) {
         setIsLoading(false);
       }
     },
-    [fetchProducts]
+    [fetchProducts],
   );
 
   // Hapus produk (admin only)
@@ -185,7 +189,7 @@ export function useProducts(options: UseProductsOptions = {}) {
         setIsLoading(false);
       }
     },
-    [fetchProducts]
+    [fetchProducts],
   );
 
   // Load produk saat component mount

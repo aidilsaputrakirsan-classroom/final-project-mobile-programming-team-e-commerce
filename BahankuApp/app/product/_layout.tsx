@@ -1,6 +1,7 @@
 import { Stack, useRouter } from 'expo-router';
-import { TouchableOpacity, StyleSheet } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
+import { TouchableOpacity, StyleSheet } from 'react-native';
+
 import { theme } from '@/theme';
 
 export default function ProductLayout() {

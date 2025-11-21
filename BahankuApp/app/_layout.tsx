@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
+import { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+
 import { useAuth } from '@/hooks/useAuth';
 import { theme } from '@/theme';
 
@@ -21,7 +22,7 @@ export default function RootLayout() {
       // Redirect ke tabs jika sudah login
       router.replace('/(tabs)');
     }
-  }, [isAuthenticated, initializing, segments]);
+  }, [isAuthenticated, initializing, segments, router]);
 
   if (initializing) {
     return (
