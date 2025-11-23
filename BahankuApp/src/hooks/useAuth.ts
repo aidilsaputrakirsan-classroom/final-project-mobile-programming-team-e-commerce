@@ -7,6 +7,27 @@ import { supabase } from '@/services/supabase.client';
 import { useAuthStore } from '@/store/auth.store';
 import { LoginCredentials, RegisterCredentials, User } from '@/types/auth';
 
+let authSubscription:
+  | ReturnType<typeof supabase.auth.onAuthStateChange>['data']['subscription']
+  | null = null;
+
+const getSessionWithTimeout = (timeoutMs: number) =>
+  new Promise<Awaited<ReturnType<typeof supabase.auth.getSession>>>(
+    (resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('timeout')), timeoutMs);
+      supabase.auth
+        .getSession()
+        .then((result) => {
+          clearTimeout(timer);
+          resolve(result);
+        })
+        .catch((error) => {
+          clearTimeout(timer);
+          reject(error);
+        });
+    },
+  );
+
 export const useAuth = () => {
   const {
     user,
@@ -97,67 +118,69 @@ export const useAuth = () => {
     [clearAuthSession, setUser],
   );
 
+  const attemptRestoreSession = useCallback(async () => {
+    try {
+      setLoading(true);
+      const result = await getSessionWithTimeout(8000);
+
+      if (result?.data.session?.user) {
+        await loadUserProfile(result.data.session.user.id);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      if (error instanceof Error && error.message === 'timeout') {
+        console.warn(
+          'Inisialisasi auth melewati batas waktu, menjalankan sesi tanpa Supabase.',
+        );
+      } else if (isInvalidRefreshToken(error)) {
+        console.warn('Refresh token tidak valid saat init, membersihkan sesi lokal.');
+        await clearAuthSession();
+      } else {
+        console.error('Error inisialisasi auth:', error);
+      }
+      return false;
+    } finally {
+      setLoading(false);
+      setInitializing(false);
+    }
+  }, [clearAuthSession, loadUserProfile, setLoading]);
+
   useEffect(() => {
-    let isMounted = true;
-    const timeoutId = setTimeout(() => {
-      if (isMounted) {
-        console.warn('Inisialisasi auth melebihi 8 detik, melanjutkan tanpa sesi.');
-        setInitializing(false);
-      }
-    }, 8000);
+    attemptRestoreSession();
 
-    const initializeAuth = async () => {
-      try {
-        setLoading(true);
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
-
-        if (error) {
-          throw error;
-        }
-
-        if (!isMounted) return;
-
-        if (session?.user) {
+    if (!authSubscription) {
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
           await loadUserProfile(session.user.id);
+        } else if (event === 'SIGNED_OUT') {
+          logoutStore();
         }
-      } catch (error) {
-        if (isInvalidRefreshToken(error)) {
-          console.warn('Refresh token tidak valid saat init, membersihkan sesi lokal.');
-          await clearAuthSession();
-        } else {
-          console.error('Error inisialisasi auth:', error);
-        }
-      } finally {
-        if (!isMounted) return;
-        clearTimeout(timeoutId);
-        setLoading(false);
-        setInitializing(false);
-      }
-    };
+      });
 
-    initializeAuth();
+      authSubscription = subscription;
+    }
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!isMounted) return;
+    return () => {};
+  }, [attemptRestoreSession, loadUserProfile, logoutStore]);
 
-      if (event === 'SIGNED_IN' && session?.user) {
-        await loadUserProfile(session.user.id);
-      } else if (event === 'SIGNED_OUT') {
-        logoutStore();
-      }
-    });
+  useEffect(() => {
+    if (initializing) {
+      return;
+    }
 
-    return () => {
-      isMounted = false;
-      clearTimeout(timeoutId);
-      subscription.unsubscribe();
-    };
-  }, [clearAuthSession, loadUserProfile, logoutStore, setLoading]);
+    if (isAuthenticated || isLoading) {
+      return;
+    }
+
+    const retryTimer = setInterval(() => {
+      attemptRestoreSession();
+    }, 10000);
+
+    return () => clearInterval(retryTimer);
+  }, [attemptRestoreSession, initializing, isAuthenticated, isLoading]);
 
   const login = async (credentials: LoginCredentials) => {
     try {

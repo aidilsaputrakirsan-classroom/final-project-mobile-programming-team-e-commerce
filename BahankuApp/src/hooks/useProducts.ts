@@ -28,7 +28,7 @@ export function useProducts(options: UseProductsOptions = {}) {
     try {
       let query = supabase
         .from('products')
-        .select('*')
+        .select('*, categories(name)')
         .order('created_at', { ascending: false });
 
       // Filter berdasarkan search
@@ -60,7 +60,13 @@ export function useProducts(options: UseProductsOptions = {}) {
 
       if (fetchError) throw fetchError;
 
-      setProducts(data || []);
+      const normalized =
+        data?.map((item) => ({
+          ...item,
+          category: item.categories?.name ?? item.category,
+        })) || [];
+
+      setProducts(normalized);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Gagal mengambil data produk';
