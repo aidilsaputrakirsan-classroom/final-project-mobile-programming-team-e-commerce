@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -25,15 +25,25 @@ export default function HomeScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const categories = [
-    { label: 'Semua', value: 'all' },
-    { label: 'Sayur', value: 'sayur' },
-    { label: 'Daging', value: 'daging' },
-    { label: 'Bumbu', value: 'bumbu' },
-    { label: 'Buah', value: 'buah' },
-  ];
+  const categories = useMemo(() => {
+    const unique = Array.from(
+      new Set(
+        products
+          .map((product) => product.category?.trim())
+          .filter((category): category is string => !!category),
+      ),
+    );
 
-  const filteredProducts = React.useMemo(() => {
+    return [
+      { label: 'Semua', value: 'all' },
+      ...unique.map((name) => ({
+        label: name,
+        value: name.toLowerCase(),
+      })),
+    ];
+  }, [products]);
+
+  const filteredProducts = useMemo(() => {
     if (selectedCategory === 'all') return products;
     return products.filter(
       (product) => product.category?.toLowerCase() === selectedCategory.toLowerCase(),

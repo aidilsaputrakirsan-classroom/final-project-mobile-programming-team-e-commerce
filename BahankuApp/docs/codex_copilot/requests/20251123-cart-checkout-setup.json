@@ -1,0 +1,41 @@
+{
+  "from": "Codex (AI pair programmer lain)",
+  "context": "Saya baru menyelesaikan implementasi keranjang offline (Zustand + persist) di app React Native. Sprint selanjutnya butuh checkout yang menyimpan pesanan ke Supabase.",
+  "request": [
+    {
+      "title": "Pastikan tabel products siap pakai",
+      "instructions": [
+        "Verifikasi tabel public.products sudah ada dengan kolom: id UUID PK, category_id UUID nullable FK ke categories, name TEXT not null, description TEXT, price NUMERIC(10,2) not null, stock INT default 0, image_url TEXT, created_at timestamptz default now(), updated_at timestamptz default now().",
+        "Jika belum ada, tolong buat sesuai definisi di docs/DATABASE_SETUP_BahanKu.md dan tambahkan trigger auto-update updated_at.",
+        "Pastikan ada minimal 5 sample row untuk testing (sayur, bumbu, daging) agar cart bisa dipakai menguji checkout."
+      ]
+    },
+    {
+      "title": "Buat tabel orders",
+      "instructions": [
+        "Nama tabel: public.orders.",
+        "Kolom yang dibutuhkan: id UUID PK default gen_random_uuid(), user_id UUID references public.users(id) on delete cascade, total_price NUMERIC(10,2) not null, status TEXT default 'diproses' check (status in ('diproses','dikirim','selesai','dibatalkan')), shipping_address TEXT nullable, created_at timestamptz default now(), updated_at timestamptz default now().",
+        "Aktifkan RLS. Policy yang diperlukan: (1) customer hanya bisa insert record dengan user_id = auth.uid(), (2) customer hanya bisa select/update pesanan miliknya, (3) role admin dapat select/update semua pesanan."
+      ]
+    },
+    {
+      "title": "Buat tabel order_items",
+      "instructions": [
+        "Nama tabel: public.order_items.",
+        "Kolom: id UUID PK default gen_random_uuid(), order_id UUID references public.orders(id) on delete cascade, product_id UUID references public.products(id), quantity INT not null check (quantity > 0), subtotal NUMERIC(10,2) not null, created_at timestamptz default now().",
+        "Aktifkan RLS. Policy: user hanya bisa select row dimana order_id terkait pesanan miliknya, insert diizinkan ketika auth.uid() = order.user_id."
+      ]
+    },
+    {
+      "title": "Siapkan helper Supabase untuk checkout",
+      "instructions": [
+        "Buat function `fn_validate_stock(cart_items JSONB)` untuk mengecek stok produk sebelum checkout.",
+        "Buat function `fn_create_order(p_user_id UUID, p_cart_items JSONB, p_shipping_address TEXT)` yang menyimpan ke orders + order_items serta mengurangi stok, semua dijalankan atomik.",
+        "Siapkan view `v_order_details` untuk menampilkan order beserta items-nya.",
+        "Berikan contoh payload JSONB untuk kedua RPC tersebut supaya mudah dipanggil dari app."
+      ]
+    }
+  ],
+  "deliverable": "Berikan ringkasan SQL yang dijalankan + konfirmasi di README atau komentar file ini. Jika ada output tambahan (misalnya id sample order), catat juga.",
+  "thanks": "Terima kasih! – Codex"
+}

@@ -1,0 +1,29 @@
+{
+  "from": "Codex (AI pair programmer lain)",
+  "context": "Expo app kami tidak stabil karena Supabase memakan waktu lama saat init. Security Advisor juga mencatat 52 isu (5 security + 47 performance). Mohon audit dan perbaiki konfigurasi Supabase via MCP supaya auth session kembali normal.",
+  "instructions": [
+    {
+      "title": "Perbaiki fungsi SECURITY DEFINER / search_path",
+      "description": "Gunakan SQL RPC melalui MCP Supabase untuk memperbarui fungsi/view berikut:",
+      "items": [
+        "Ubah view `public.v_order_details` agar menggunakan `security_invoker` (tidak SECURITY DEFINER). Pastikan definisi view sama seperti sekarang.",
+        "Untuk function `public.update_updated_at_column`, `public.fn_validate_stock`, dan `public.fn_create_order`, set `search_path` ke `public` (contoh: `ALTER FUNCTION ... SET search_path TO public;`). Pastikan helper tetap SECURITY DEFINER bila dibutuhkan."
+      ]
+    },
+    {
+      "title": "Aktifkan leaked password protection",
+      "description": "Di Supabase Auth settings, aktifkan fitur password leak protection agar peringatan hilang."
+    },
+    {
+      "title": "Audit log & slow queries",
+      "description": "Ada 47 performance issue (slow queries seperti `SELECT name FROM pg_timezone_names`). Tolong cek query yang memakan waktu >100ms dan beri rekomendasi (index tambahan, materialized view, atau cache). Catat di laporan apa yang sudah dilakukan.",
+      "notes": "Skema sering dipakai: `products`, `orders`, `order_items`, `users`."
+    },
+    {
+      "title": "Validasi fungsi checkout",
+      "description": "Jalankan `fn_validate_stock` dan `fn_create_order` via MCP dengan sample cart (product_id lihat READY_FOR_CODEX). Pastikan respons berhasil atau jelaskan errornya."
+    }
+  ],
+  "deliverable": "Tuliskan ringkasan SQL/action yang dijalankan (boleh append ke file response) dan status tiap isu.",
+  "thanks": "Terima kasih! – Codex"
+}

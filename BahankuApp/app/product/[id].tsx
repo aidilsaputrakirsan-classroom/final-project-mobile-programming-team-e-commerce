@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ShoppingCart, Minus, Plus } from 'lucide-react-native';
+import { ShoppingCart } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -9,10 +9,13 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 
+import { QuantityStepper } from '@/components/QuantityStepper';
 import { useProducts } from '@/hooks/useProducts';
 import { formatCurrency } from '@/libs/currency';
+import { useCartStore } from '@/store/cart.store';
 import { theme } from '@/theme';
 import { Product } from '@/types/product';
 
@@ -21,6 +24,7 @@ export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getProductById } = useProducts({ autoFetch: false });
 
+  const addItemToCart = useCartStore((state) => state.addItem);
   const [product, setProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
@@ -66,23 +70,14 @@ export default function ProductDetailScreen() {
     };
   }, [id, getProductById]);
 
-  // Handle quantity
-  const increaseQuantity = () => {
-    if (product && quantity < product.stock) {
-      setQuantity(quantity + 1);
-    }
-  };
-
-  const decreaseQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
-    }
-  };
-
   // Handle add to cart
   const handleAddToCart = () => {
-    // TODO: Implementasi keranjang belanja
-    alert(`Menambahkan ${quantity}x ${product?.name} ke keranjang`);
+    if (!product) {
+      return;
+    }
+    addItemToCart(product, quantity);
+    Alert.alert('Berhasil', `${product.name} ditambahkan ke keranjang`);
+    setQuantity(1);
   };
 
   // Loading state
@@ -143,41 +138,7 @@ export default function ProductDetailScreen() {
           {product.stock > 0 && (
             <View style={styles.quantityContainer}>
               <Text style={styles.sectionTitle}>Jumlah</Text>
-              <View style={styles.quantitySelector}>
-                <TouchableOpacity
-                  style={[
-                    styles.quantityButton,
-                    quantity === 1 && styles.quantityButtonDisabled,
-                  ]}
-                  onPress={decreaseQuantity}
-                  disabled={quantity === 1}
-                >
-                  <Minus
-                    size={20}
-                    color={
-                      quantity === 1 ? theme.colors.textSecondary : theme.colors.text
-                    }
-                  />
-                </TouchableOpacity>
-                <Text style={styles.quantityValue}>{quantity}</Text>
-                <TouchableOpacity
-                  style={[
-                    styles.quantityButton,
-                    quantity === product.stock && styles.quantityButtonDisabled,
-                  ]}
-                  onPress={increaseQuantity}
-                  disabled={quantity === product.stock}
-                >
-                  <Plus
-                    size={20}
-                    color={
-                      quantity === product.stock
-                        ? theme.colors.textSecondary
-                        : theme.colors.text
-                    }
-                  />
-                </TouchableOpacity>
-              </View>
+              <QuantityStepper value={quantity} max={product.stock} onChange={setQuantity} />
             </View>
           )}
         </View>
@@ -293,31 +254,6 @@ const styles = StyleSheet.create({
   },
   quantityContainer: {
     marginBottom: theme.spacing.lg,
-  },
-  quantitySelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.md,
-  },
-  quantityButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  quantityButtonDisabled: {
-    opacity: 0.5,
-  },
-  quantityValue: {
-    fontSize: theme.fontSize.xl,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text,
-    minWidth: 40,
-    textAlign: 'center',
   },
   bottomContainer: {
     padding: theme.spacing.lg,

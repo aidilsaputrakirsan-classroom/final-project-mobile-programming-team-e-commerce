@@ -85,13 +85,20 @@ export function useProducts(options: UseProductsOptions = {}) {
     try {
       const { data, error: fetchError } = await supabase
         .from('products')
-        .select('*')
+        .select('*, categories(name)')
         .eq('id', id)
         .single();
 
       if (fetchError) throw fetchError;
 
-      return data as Product;
+      if (!data) {
+        return null;
+      }
+
+      return {
+        ...data,
+        category: data.categories?.name ?? data.category,
+      } as Product;
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Gagal mengambil detail produk';
