@@ -12,15 +12,27 @@ interface CartItemRowProps {
   item: CartItem;
   onQuantityChange: (quantity: number) => void;
   onRemove: () => void;
+  onToggleSelect: () => void;
 }
 
-export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowProps) {
-  const { product, quantity } = item;
+export function CartItemRow({ item, onQuantityChange, onRemove, onToggleSelect }: CartItemRowProps) {
+  const { product, quantity, selected } = item;
   const subtotal = product.price * quantity;
   const maxQuantity = Math.max(1, product.stock);
 
+  // Tentukan style border berdasarkan status selected
+  const dynamicStyle = selected
+    ? { borderColor: '#10B981', borderWidth: 2 } // hijau untuk selected
+    : {}; // default style untuk unselected
+
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      style={[styles.container, dynamicStyle]}
+      onPress={onToggleSelect}
+      activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityLabel={selected ? `${product.name} terpilih, tap untuk batalkan` : `${product.name} tidak terpilih, tap untuk memilih`}
+    >
       <Image
         source={{
           uri: product.image_url || 'https://via.placeholder.com/120',
@@ -38,18 +50,22 @@ export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowPro
             <Text style={styles.price}>{formatCurrency(product.price)}</Text>
           </View>
 
-          <TouchableOpacity
-            onPress={onRemove}
-            style={styles.removeButton}
-            accessibilityRole="button"
-            accessibilityLabel={`Hapus ${product.name}`}
-          >
-            <Trash2 size={18} color={theme.colors.error} />
-          </TouchableOpacity>
+          <View onStartShouldSetResponder={() => true}>
+            <TouchableOpacity
+              onPress={onRemove}
+              style={styles.removeButton}
+              accessibilityRole="button"
+              accessibilityLabel={`Hapus ${product.name}`}
+            >
+              <Trash2 size={18} color={theme.colors.error} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.footer}>
-          <QuantityStepper value={quantity} max={maxQuantity} onChange={onQuantityChange} />
+          <View onStartShouldSetResponder={() => true}>
+            <QuantityStepper value={quantity} max={maxQuantity} onChange={onQuantityChange} />
+          </View>
 
           <View style={styles.subtotalContainer}>
             <Text style={styles.subtotalLabel}>Subtotal</Text>
@@ -59,7 +75,7 @@ export function CartItemRow({ item, onQuantityChange, onRemove }: CartItemRowPro
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -70,6 +86,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.lg,
     gap: theme.spacing.md,
+    borderWidth: 0,
+    borderColor: 'transparent',
     ...theme.shadows.sm,
   },
   image: {

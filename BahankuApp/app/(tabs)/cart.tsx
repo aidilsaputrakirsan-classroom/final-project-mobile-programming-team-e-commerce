@@ -15,6 +15,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Square, CheckSquare, MinusSquare } from 'lucide-react-native';
 
 import { CartItemRow } from '@/components/cart';
 import { EmptyState } from '@/components/EmptyState';
@@ -31,6 +32,13 @@ export default function CartScreen() {
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
   const clearCart = useCartStore((state) => state.clearCart);
+  const toggleSelection = useCartStore((state) => state.toggleSelection);
+  const selectAll = useCartStore((state) => state.selectAll);
+  const unselectAll = useCartStore((state) => state.unselectAll);
+  const getSelectedTotal = useCartStore((state) => state.getSelectedTotal);
+  const getSelectedItemCount = useCartStore((state) => state.getSelectedItemCount);
+  const getSelectedItemsCount = useCartStore((state) => state.getSelectedItemsCount);
+  const getSelectedItems = useCartStore((state) => state.getSelectedItems);
   const { createOrder, loading: orderLoading } = useOrders();
 
   const [checkoutVisible, setCheckoutVisible] = useState(false);
@@ -38,16 +46,17 @@ export default function CartScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [addressError, setAddressError] = useState<string | null>(null);
 
-  const totalAmount = useMemo(
-    () =>
-      items.reduce(
-        (total, item) => total + item.product.price * item.quantity,
-        0,
-      ),
+  const selectedItems = useMemo(() => getSelectedItems(), [items]);
+  const selectedTotal = useMemo(() => getSelectedTotal(), [items]);
+  const selectedCount = useMemo(() => getSelectedItemCount(), [items]);
+  const selectedItemsCount = useMemo(() => getSelectedItemsCount(), [items]);
+  const totalItemsCount = items.length;
+  const allSelected = useMemo(
+    () => items.length > 0 && items.every((item) => item.selected),
     [items],
   );
-  const itemCount = useMemo(
-    () => items.reduce((total, item) => total + item.quantity, 0),
+  const someSelected = useMemo(
+    () => items.some((item) => item.selected),
     [items],
   );
 
@@ -72,8 +81,8 @@ export default function CartScreen() {
       return;
     }
 
-    if (items.length === 0) {
-      Alert.alert('Keranjang Kosong', 'Tambahkan produk terlebih dulu.');
+    if (selectedItems.length === 0) {
+      Alert.alert('Pilih Produk', 'Pilih minimal satu produk untuk checkout.');
       return;
     }
 
@@ -99,7 +108,7 @@ export default function CartScreen() {
       return;
     }
 
-    const cartPayload = items.map((item) => ({
+    const cartPayload = selectedItems.map((item) => ({
       product_id: item.product.id,
       quantity: item.quantity,
     }));
@@ -112,7 +121,9 @@ export default function CartScreen() {
         shippingAddress: shippingAddress.trim(),
       });
 
-      clearCart();
+      // Hapus hanya item yang sudah di-checkout dari cart
+      selectedItems.forEach((item) => removeItem(item.product.id));
+      
       setCheckoutVisible(false);
       setShippingAddress('');
       setAddressError(null);
@@ -136,8 +147,10 @@ export default function CartScreen() {
   const renderItem: ListRenderItem<CartItem> = ({ item }) => (
     <CartItemRow
       item={item}
-      onQuantityChange={(quantity) => updateQuantity(item.product.id, quantity)}
+      // onQuantityChange={(quantity) => updateQuantity(item.product.id, quantity)}
+      onQuantityChange={(quantity: number) => updateQuantity(item.product.id, quantity)}
       onRemove={() => handleRemoveItem(item)}
+      onToggleSelect={() => toggleSelection(item.product.id)}
     />
   );
 
@@ -157,13 +170,48 @@ export default function CartScreen() {
     </View>
   );
 
+  const handleToggleSelectAll = () => {
+    if (allSelected) {
+      unselectAll();
+    } else {
+      selectAll();
+    }
+  };
+
+  const renderSelectAllHeader = () => {
+    if (items.length === 0) return null;
+
+    return (
+      <View style={styles.selectAllContainer}>
+        <TouchableOpacity
+          onPress={handleToggleSelectAll}
+          style={styles.selectAllButton}
+          accessibilityRole="checkbox"
+          accessibilityState={{ checked: allSelected }}
+          accessibilityLabel="Pilih semua produk"
+        >
+          {allSelected ? (
+            <CheckSquare size={24} color={theme.colors.primary} />
+          ) : someSelected ? (
+            <MinusSquare size={24} color={theme.colors.primary} />
+          ) : (
+            <Square size={24} color={theme.colors.textSecondary} />
+          )}
+          <Text style={styles.selectAllText}>Pilih Semua</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Keranjang</Text>
           {items.length > 0 && (
-            <Text style={styles.headerSubtitle}>{itemCount} item</Text>
+            <Text style={styles.headerSubtitle}>
+              {selectedItemsCount} item dipilih dari {totalItemsCount} item
+            </Text>
           )}
         </View>
 
@@ -171,6 +219,7 @@ export default function CartScreen() {
           data={items}
           keyExtractor={(item) => item.product.id}
           renderItem={renderItem}
+          ListHeaderComponent={renderSelectAllHeader}
           contentContainerStyle={[
             styles.listContent,
             items.length === 0 && styles.listContentEmpty,
@@ -183,16 +232,16 @@ export default function CartScreen() {
         <View style={styles.summaryContainer}>
           <View>
             <Text style={styles.summaryLabel}>Total Pembayaran</Text>
-            <Text style={styles.summaryValue}>{formatCurrency(totalAmount)}</Text>
+            <Text style={styles.summaryValue}>{formatCurrency(selectedTotal)}</Text>
           </View>
           <TouchableOpacity
             style={[
               styles.checkoutButton,
-              (items.length === 0 || orderLoading || submitting) &&
+              (selectedItems.length === 0 || orderLoading || submitting) &&
                 styles.checkoutButtonDisabled,
             ]}
             onPress={openCheckoutModal}
-            disabled={items.length === 0 || orderLoading || submitting}
+            disabled={selectedItems.length === 0 || orderLoading || submitting}
             activeOpacity={0.8}
           >
             {orderLoading || submitting ? (
@@ -218,7 +267,7 @@ export default function CartScreen() {
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Konfirmasi Checkout</Text>
               <Text style={styles.modalSubtitle}>
-                Total {formatCurrency(totalAmount)} untuk {itemCount} item
+                Total {formatCurrency(selectedTotal)} untuk {selectedCount} item
               </Text>
 
               <Text style={styles.inputLabel}>Alamat Pengiriman</Text>
@@ -310,6 +359,23 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: theme.spacing.sm,
+  },
+  selectAllContainer: {
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.sm,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    marginBottom: theme.spacing.md,
+  },
+  selectAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+  },
+  selectAllText: {
+    fontSize: theme.fontSize.md,
+    color: theme.colors.text,
+    fontWeight: theme.fontWeight.medium,
   },
   emptyStateContainer: {
     alignItems: 'center',

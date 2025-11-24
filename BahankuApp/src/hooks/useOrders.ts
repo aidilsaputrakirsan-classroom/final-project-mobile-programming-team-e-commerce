@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import {
   CreateOrderParams,
   CreateOrderResult,
+  OrderStatus,
   OrderSummary,
   ValidateStockResult,
 } from '@/types/order';
@@ -14,9 +15,11 @@ interface UseOrdersReturn {
   loading: boolean;
   error: string | null;
   fetchOrders: (userId?: string) => Promise<void>;
+  fetchAllOrders: () => Promise<void>;
   createOrder: (params: CreateOrderParams) => Promise<CreateOrderResult>;
   validateStock: (items: CreateOrderParams['cartItems']) => Promise<ValidateStockResult[]>;
   getOrderById: (orderId: string) => Promise<OrderSummary | null>;
+  updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
 }
 
 const normalizeOrders = (data?: OrderSummary[] | null): OrderSummary[] => {
@@ -85,6 +88,30 @@ export const useOrders = (): UseOrdersReturn => {
     },
     [],
   );
+
+  const fetchAllOrders = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('v_order_details')
+        .select('*')
+        .order('order_date', { ascending: false });
+
+      if (fetchError) {
+        throw fetchError;
+      }
+
+      setOrders(normalizeOrders(data as OrderSummary[] | null));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Gagal memuat semua pesanan';
+      setError(message);
+      console.error('Error fetch all orders:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const createOrder = useCallback(
     async ({ userId, cartItems, shippingAddress }: CreateOrderParams) => {
@@ -167,21 +194,75 @@ export const useOrders = (): UseOrdersReturn => {
     }
   }, []);
 
+  const updateOrderStatus = useCallback(
+    async (orderId: string, status: OrderStatus) => {
+      if (!orderId) {
+        throw new Error('Order tidak ditemukan.');
+      }
+
+      if (user?.role !== 'admin') {
+        throw new Error('Hanya admin yang dapat mengubah status pesanan.');
+      }
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const { error: updateError } = await supabase
+          .from('orders')
+          .update({ status })
+          .eq('id', orderId);
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        setOrders((prev) =>
+          prev.map((order) =>
+            order.order_id === orderId
+              ? {
+                  ...order,
+                  status,
+                }
+              : order,
+          ),
+        );
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : 'Gagal memperbarui status pesanan';
+        setError(message);
+        console.error('Error update order status:', err);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user?.role],
+  );
+
   useEffect(() => {
-    if (user?.id) {
-      fetchOrders(user.id);
-    } else {
+    if (!user?.id) {
       setOrders([]);
+      return;
     }
-  }, [fetchOrders, user?.id]);
+
+    if (user.role === 'admin') {
+      fetchAllOrders();
+      return;
+    }
+
+    fetchOrders(user.id);
+  }, [fetchAllOrders, fetchOrders, user?.id, user?.role]);
 
   return {
     orders,
     loading,
     error,
     fetchOrders,
+    fetchAllOrders,
     createOrder,
     validateStock,
     getOrderById,
+    updateOrderStatus,
   };
 };

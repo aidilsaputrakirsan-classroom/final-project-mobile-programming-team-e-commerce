@@ -7,6 +7,7 @@ import { Product } from '@/types/product';
 export interface CartItem {
   product: Product;
   quantity: number;
+  selected: boolean;
 }
 
 interface CartState {
@@ -14,9 +15,16 @@ interface CartState {
   addItem: (product: Product, quantity: number) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   removeItem: (productId: string) => void;
+  toggleSelection: (productId: string) => void;
+  selectAll: () => void;
+  unselectAll: () => void;
   clearCart: () => void;
   getTotal: () => number;
+  getSelectedTotal: () => number;
   getItemCount: () => number;
+  getSelectedItemCount: () => number;
+  getSelectedItemsCount: () => number;
+  getSelectedItems: () => CartItem[];
 }
 
 const clampQuantity = (quantity: number, stock?: number) => {
@@ -53,7 +61,7 @@ export const useCartStore = create<CartState>()(
             return {
               items: [
                 ...state.items,
-                { product, quantity: clampQuantity(quantity, product.stock) },
+                { product, quantity: clampQuantity(quantity, product.stock), selected: true },
               ],
             };
           }
@@ -74,9 +82,9 @@ export const useCartStore = create<CartState>()(
           items: state.items.map((item) =>
             item.product.id === productId
               ? {
-                  ...item,
-                  quantity: clampQuantity(quantity, item.product.stock),
-                }
+                ...item,
+                quantity: clampQuantity(quantity, item.product.stock),
+              }
               : item,
           ),
         }));
@@ -86,19 +94,61 @@ export const useCartStore = create<CartState>()(
           items: state.items.filter((item) => item.product.id !== productId),
         }));
       },
+      toggleSelection: (productId) => {
+        set((state) => ({
+          items: state.items.map((item) =>
+            item.product.id === productId
+              ? { ...item, selected: !item.selected }
+              : item
+          ),
+        }));
+      },
+      selectAll: () => {
+        set((state) => ({
+          items: state.items.map((item) => ({ ...item, selected: true })),
+        }));
+      },
+      unselectAll: () => {
+        set((state) => ({
+          items: state.items.map((item) => ({ ...item, selected: false })),
+        }));
+      },
       clearCart: () => set({ items: [] }),
       getTotal: () =>
         get().items.reduce(
           (total, item) => total + item.product.price * item.quantity,
           0,
         ),
+      getSelectedTotal: () =>
+        get().items.reduce(
+          (total, item) =>
+            item.selected ? total + item.product.price * item.quantity : total,
+          0,
+        ),
       getItemCount: () =>
         get().items.reduce((total, item) => total + item.quantity, 0),
+      getSelectedItemCount: () =>
+        get().items.reduce(
+          (total, item) => (item.selected ? total + item.quantity : total),
+          0,
+        ),
+      getSelectedItemsCount: () =>
+        get().items.filter((item) => item.selected).length,
+      getSelectedItems: () => get().items.filter((item) => item.selected),
     }),
     {
       name: 'bahanku-cart-store',
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({ items: state.items }),
+      onRehydrateStorage: () => (state) => {
+        // Migrasi: set selected = true untuk item yang belum punya property selected
+        if (state?.items) {
+          state.items = state.items.map((item) => ({
+            ...item,
+            selected: item.selected ?? true,
+          }));
+        }
+      },
     },
   ),
 );

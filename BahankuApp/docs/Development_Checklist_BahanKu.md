@@ -60,10 +60,10 @@ Penanggung jawab: (Pangeran) | (Adam)
 
 ## 6. Pesanan
 
-- [Belum Dibuat] Hook useOrders (createOrder, listMyOrders, updateStatus) (Pangeran)
-- [Belum Dibuat] Insert order & order_items ke Supabase (Pangeran)
-- [Belum Dibuat] Halaman orders.tsx (riwayat pesanan user) (Pangeran)
-- [Belum Dibuat] Halaman admin/orders.tsx (ubah status pesanan) (Pangeran)
+- [Sedang Dikerjakan] Hook useOrders (createOrder, listMyOrders, updateStatus) (Pangeran) — fungsi create/list/detail/status sudah tersedia, menunggu pengujian lanjutan
+- [Sedang Dikerjakan] Insert order & order_items ke Supabase (Pangeran) — integrasi RPC `fn_create_order` + view `v_order_details`
+- [Sedang Dikerjakan] Halaman orders.tsx (riwayat pesanan user) (Pangeran) — versi dasar selesai + navigasi ke detail pesanan
+- [Sedang Dikerjakan] Halaman admin/orders.tsx (ubah status pesanan) (Pangeran) — versi sederhana untuk update status & buka detail
 
 ---
 

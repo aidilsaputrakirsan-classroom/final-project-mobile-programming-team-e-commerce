@@ -1,4 +1,4 @@
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
   View,
@@ -7,6 +7,7 @@ import {
   FlatList,
   ActivityIndicator,
   RefreshControl,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -18,6 +19,7 @@ import { theme } from '@/theme';
 import { OrderSummary } from '@/types/order';
 
 export default function OrdersScreen() {
+  const router = useRouter();
   const { user } = useAuth();
   const { orders, loading, error, fetchOrders } = useOrders();
   const [refreshing, setRefreshing] = useState(false);
@@ -44,8 +46,18 @@ export default function OrdersScreen() {
     }
   };
 
+  const handleOrderPress = (orderId: string) => {
+    router.push(`/order/${orderId}`);
+  };
+
   const renderItem = ({ item }: { item: OrderSummary }) => (
-    <OrderCard order={item} />
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={() => handleOrderPress(item.order_id)}
+      style={styles.cardWrapper}
+    >
+      <OrderCard order={item} />
+    </TouchableOpacity>
   );
 
   const listContentStyle =
@@ -166,5 +178,8 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: theme.spacing.md,
+  },
+  cardWrapper: {
+    borderRadius: theme.borderRadius.lg,
   },
 });

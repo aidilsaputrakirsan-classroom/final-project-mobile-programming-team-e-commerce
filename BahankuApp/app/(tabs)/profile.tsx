@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/hooks/useAuth';
 import { theme } from '@/theme';
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { user, logout } = useAuth();
 
   const handleLogout = async () => {
@@ -22,6 +24,15 @@ export default function ProfileScreen() {
         <View style={styles.content}>
           <Text style={styles.subtitle}>{user?.email || 'User'}</Text>
           <Text style={styles.info}>Coming soon...</Text>
+
+          {user?.role === 'admin' ? (
+            <TouchableOpacity
+              style={styles.adminButton}
+              onPress={() => router.push('/admin/orders')}
+            >
+              <Text style={styles.adminButtonText}>Kelola Pesanan</Text>
+            </TouchableOpacity>
+          ) : null}
 
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <Text style={styles.logoutText}>Logout</Text>
@@ -69,6 +80,18 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     color: theme.colors.primary,
     marginBottom: theme.spacing.xl,
+  },
+  adminButton: {
+    backgroundColor: theme.colors.secondary,
+    paddingHorizontal: theme.spacing.xl,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.borderRadius.md,
+    marginBottom: theme.spacing.lg,
+  },
+  adminButtonText: {
+    color: '#fff',
+    fontSize: theme.fontSize.md,
+    fontWeight: theme.fontWeight.semibold,
   },
   logoutButton: {
     backgroundColor: theme.colors.error,

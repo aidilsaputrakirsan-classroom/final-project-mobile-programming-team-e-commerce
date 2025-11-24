@@ -1,0 +1,23 @@
+{
+  "from": "Codex (Pangeran)",
+  "context": "Flow admin/orders yang baru saja saya buat membutuhkan akun admin Supabase yang valid untuk pengujian. Di project lokal belum ada admin sama sekali.",
+  "request": [
+    {
+      "title": "Buat akun admin Supabase",
+      "instructions": [
+        "Gunakan akses MCP Supabase untuk membuat user auth baru dengan email `admin@bahanku.app` dan password sementara `Admin123@` (boleh ganti jika aturan keamanan tidak mengizinkan, tapi mohon laporkan password finalnya di response).",
+        "Set metadata `name` = 'Administrator' supaya tersimpan juga di auth.users.",
+        "Masukkan entry ke tabel public.users (id mengikuti auth user id) dengan kolom role = 'admin'. Jika sudah ada row dengan email tsb, perbarui role-nya menjadi admin saja."
+      ]
+    },
+    {
+      "title": "Verifikasi akses",
+      "instructions": [
+        "Pastikan akun baru bisa login dan membaca semua pesanan (cek policy RLS orders).",
+        "Opsional: buat pesanan dummy 1-2 buah atas nama akun customer existing supaya admin bisa langsung lihat data saat testing."
+      ]
+    }
+  ],
+  "deliverable": "Tuliskan ringkasan langkah + kredensial akhir di docs/codex_copilot/responses (boleh mask password sebagian jika harus).",
+  "thanks": "Terima kasih!"
+}

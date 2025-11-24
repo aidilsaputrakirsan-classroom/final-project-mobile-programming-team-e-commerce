@@ -1,0 +1,37 @@
+{
+  "from": "Codex (Pangeran)",
+  "context": "Aku baru saja menyelesaikan fungsi backend & UI dasar untuk flow pesanan (orders list, detail, admin list). Semua masih minimalis karena prioritasnya memastikan data mengalir dulu. Sekarang butuh bantuan Adam/Copilot buat memoles tampilan supaya sesuai design system dan enak dipakai.",
+  "request": [
+    {
+      "title": "Perbaiki UX halaman \"Pesanan\" customer",
+      "instructions": [
+        "File utama: app/(tabs)/orders.tsx dan komponen pendukung di src/components/orders/OrderCard.tsx.",
+        "Buat desain kartu pesanan yang lebih informatif (status badge, ringkasan item, CTA ke detail). Gunakan theme spacing & warna dari '@/theme'.",
+        "Tambahkan filter/status chip + search sederhana bila memungkinkan agar user bisa cepat menemukan pesanan tertentu (gunakan debounce 300ms).",
+        "Pastikan aksesibilitas: teks status jelas, ada empty-state ilustrasi ringan, loading skeleton bila data belum ada."
+      ]
+    },
+    {
+      "title": "Desain ulang halaman detail pesanan",
+      "instructions": [
+        "File: app/order/[id].tsx. Saat ini hanya menampilkan teks polos.",
+        "Tambah komponen status timeline (Diproses -> Dikirim -> Selesai) dengan indikator aktif sesuai order.status.",
+        "Render daftar item dengan gambar kecil produk (gunakan image_url dari order.items[].image_url jika tersedia, fallback placeholder).",
+        "Tambahkan ringkasan pembayaran (subtotal, ongkir placeholder, total) + tombol aksi (Hubungi admin / Salin No. Pesanan).",
+        "Pastikan scroll view nyaman dan responsif di iOS/Android, serta tetap gunakan Bahasa Indonesia untuk label."
+      ]
+    },
+    {
+      "title": "Tingkatkan UI halaman admin/orders",
+      "instructions": [
+        "File: app/admin/orders.tsx. Sekarang masih sangat wireframe.",
+        "Buat layout list dengan filter status + pencarian berdasarkan nama/email. Gunakan FlatList + sticky header bila perlu.",
+        "Tambahkan search bar persist (debounce 300ms) plus opsi sort (misal terbaru, total terbesar) di area filter agar admin bisa cepat mencari pesanan tertentu.",
+        "Saat tombol 'Ubah Status' ditekan, tampilkan bottom sheet/modal yang lebih informatif (menampilkan histori status + dropdown). Hindari Modal polos bawaan.",
+        "Tambahkan badge ringkas untuk alamat/total serta shortcut ke detail order. Pastikan komponen memanfaatkan fungsi updateOrderStatus dari hook tanpa mengubah logika backend."
+      ]
+    }
+  ],
+  "deliverable": "Pull Request atau catatan perubahan yang menjelaskan update UI (beserta screenshot sebelum/after jika bisa).",
+  "thanks": "Thanks Adam!"
+}
