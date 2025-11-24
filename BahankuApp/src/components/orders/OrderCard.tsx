@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
+import { Package, MapPin, Calendar } from 'lucide-react-native';
 
 import { formatCurrency } from '@/libs/currency';
 import { theme } from '@/theme';
@@ -17,10 +18,17 @@ const statusLabel: Record<OrderStatus, string> = {
 };
 
 const statusColor: Record<OrderStatus, string> = {
-  diproses: '#f59e0b',
-  dikirim: '#3b82f6',
-  selesai: '#10b981',
-  dibatalkan: '#ef4444',
+  diproses: '#F59E0B',
+  dikirim: '#3B82F6',
+  selesai: '#10B981',
+  dibatalkan: '#EF4444',
+};
+
+const statusBgColor: Record<OrderStatus, string> = {
+  diproses: '#FEF3C7',
+  dikirim: '#DBEAFE',
+  selesai: '#D1FAE5',
+  dibatalkan: '#FEE2E2',
 };
 
 const formatDate = (isoDate: string) => {
@@ -39,40 +47,74 @@ const formatDate = (isoDate: string) => {
 
 export function OrderCard({ order }: OrderCardProps) {
   const badgeColor = statusColor[order.status] || theme.colors.primary;
+  const badgeBgColor = statusBgColor[order.status] || theme.colors.border;
   const itemCount = order.items?.length || 0;
-  const mainItemName = order.items?.[0]?.product_name ?? 'Pesanan';
+  const mainItem = order.items?.[0];
   const extraCount = itemCount > 1 ? itemCount - 1 : 0;
 
   return (
     <View style={styles.card}>
-      <View style={styles.row}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.orderId}>
-            {mainItemName}
-            {extraCount > 0 ? ` +${extraCount} item` : ''}
-          </Text>
+      {/* Header dengan status badge */}
+      <View style={styles.headerRow}>
+        <View style={styles.headerLeft}>
+          <Calendar size={16} color={theme.colors.textSecondary} />
           <Text style={styles.dateText}>{formatDate(order.order_date)}</Text>
         </View>
-        <View style={[styles.badge, { backgroundColor: badgeColor }]}>
-          <Text style={styles.badgeText}>{statusLabel[order.status]}</Text>
+        <View style={[styles.statusBadge, { backgroundColor: badgeBgColor }]}>
+          <Text style={[styles.statusText, { color: badgeColor }]}>
+            {statusLabel[order.status]}
+          </Text>
         </View>
       </View>
+
+      {/* Item preview dengan gambar */}
+      <View style={styles.itemPreview}>
+        {mainItem?.image_url ? (
+          <Image
+            source={{ uri: mainItem.image_url }}
+            style={styles.itemImage}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={styles.itemImagePlaceholder}>
+            <Package size={24} color={theme.colors.textSecondary} />
+          </View>
+        )}
+        <View style={styles.itemInfo}>
+          <Text style={styles.itemName} numberOfLines={1}>
+            {mainItem?.product_name || 'Pesanan'}
+          </Text>
+          <View style={styles.itemMeta}>
+            <Package size={14} color={theme.colors.textSecondary} />
+            <Text style={styles.itemMetaText}>
+              {itemCount} item{extraCount > 0 ? ` (+${extraCount} lainnya)` : ''}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Alamat pengiriman */}
+      {order.shipping_address ? (
+        <View style={styles.addressRow}>
+          <MapPin size={14} color={theme.colors.textSecondary} />
+          <Text style={styles.addressText} numberOfLines={2}>
+            {order.shipping_address}
+          </Text>
+        </View>
+      ) : null}
 
       <View style={styles.divider} />
 
-      <View style={styles.row}>
-        <Text style={styles.totalLabel}>Total</Text>
-        <Text style={styles.totalValue}>{formatCurrency(order.total_price)}</Text>
-      </View>
-
-      <Text style={styles.itemLabel}>{itemCount} item</Text>
-
-      {order.shipping_address ? (
-        <View style={styles.addressContainer}>
-          <Text style={styles.addressLabel}>Alamat Pengiriman</Text>
-          <Text style={styles.addressValue}>{order.shipping_address}</Text>
+      {/* Footer dengan total */}
+      <View style={styles.footer}>
+        <View>
+          <Text style={styles.totalLabel}>Total Pembayaran</Text>
+          <Text style={styles.totalValue}>{formatCurrency(order.total_price)}</Text>
         </View>
-      ) : null}
+        <View style={styles.ctaButton}>
+          <Text style={styles.ctaText}>Lihat Detail</Text>
+        </View>
+      </View>
     </View>
   );
 }
@@ -84,66 +126,112 @@ const styles = StyleSheet.create({
     padding: theme.spacing.lg,
     ...theme.shadows.sm,
   },
-  row: {
+  headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: theme.spacing.sm,
+    alignItems: 'center',
+    marginBottom: theme.spacing.md,
   },
-  titleContainer: {
-    flex: 1,
-  },
-  orderId: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text,
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
   },
   dateText: {
-    marginTop: theme.spacing.xs,
     fontSize: theme.fontSize.sm,
     color: theme.colors.textSecondary,
   },
-  badge: {
-    borderRadius: theme.borderRadius.full,
+  statusBadge: {
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.full,
   },
-  badgeText: {
-    color: '#ffffff',
+  statusText: {
     fontSize: theme.fontSize.sm,
     fontWeight: theme.fontWeight.semibold,
+  },
+  itemPreview: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+  },
+  itemImage: {
+    width: 60,
+    height: 60,
+    borderRadius: theme.borderRadius.md,
+    backgroundColor: theme.colors.border,
+  },
+  itemImagePlaceholder: {
+    width: 60,
+    height: 60,
+    borderRadius: theme.borderRadius.md,
+    backgroundColor: theme.colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  itemInfo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  itemName: {
+    fontSize: theme.fontSize.md,
+    fontWeight: theme.fontWeight.semibold,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.xs,
+  },
+  itemMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+  },
+  itemMetaText: {
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.textSecondary,
+  },
+  addressRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.xs,
+    marginBottom: theme.spacing.md,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.sm,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.md,
+  },
+  addressText: {
+    flex: 1,
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.textSecondary,
+    lineHeight: 18,
   },
   divider: {
     height: 1,
     backgroundColor: theme.colors.border,
-    marginVertical: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   totalLabel: {
-    fontSize: theme.fontSize.md,
+    fontSize: theme.fontSize.sm,
     color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.xs,
   },
   totalValue: {
     fontSize: theme.fontSize.xl,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.text,
   },
-  itemLabel: {
-    marginTop: theme.spacing.sm,
+  ctaButton: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.md,
+  },
+  ctaText: {
     fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
-  },
-  addressContainer: {
-    marginTop: theme.spacing.md,
-    backgroundColor: theme.colors.surface,
-  },
-  addressLabel: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.xs,
-  },
-  addressValue: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.text,
-    lineHeight: 20,
+    fontWeight: theme.fontWeight.semibold,
+    color: '#FFFFFF',
   },
 });
