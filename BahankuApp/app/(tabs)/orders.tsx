@@ -97,27 +97,29 @@ export default function OrdersScreen() {
   );
 
   const renderFilterChips = () => (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.filterChipsContainer}
-    >
-      {statusFilters.map((filter) => {
-        const isActive = selectedStatus === filter.value;
-        return (
-          <TouchableOpacity
-            key={filter.value}
-            style={[styles.filterChip, isActive && styles.filterChipActive]}
-            onPress={() => setSelectedStatus(filter.value)}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
-              {filter.label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-    </ScrollView>
+    <View style={styles.filterChipsWrapper}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.filterChipsContainer}
+      >
+        {statusFilters.map((filter) => {
+          const isActive = selectedStatus === filter.value;
+          return (
+            <TouchableOpacity
+              key={filter.value}
+              style={[styles.filterChip, isActive && styles.filterChipActive]}
+              onPress={() => setSelectedStatus(filter.value)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
+                {filter.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+    </View>
   );
 
   const listContentStyle =
@@ -258,18 +260,22 @@ const styles = StyleSheet.create({
   clearButton: {
     padding: theme.spacing.xs,
   },
+  filterChipsWrapper: {
+    backgroundColor: '#FFFFFF',
+    paddingBottom: theme.spacing.xs,
+  },
   filterChipsContainer: {
     paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.md,
-    gap: theme.spacing.sm,
+    paddingVertical: theme.spacing.sm,
   },
   filterChip: {
-    paddingHorizontal: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.surface,
     borderWidth: 1,
     borderColor: theme.colors.border,
+    marginRight: theme.spacing.sm,
   },
   filterChipActive: {
     backgroundColor: theme.colors.primary,

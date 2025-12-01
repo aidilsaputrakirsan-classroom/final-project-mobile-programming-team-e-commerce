@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import { Package, MapPin, Calendar } from 'lucide-react-native';
+import { Package, MapPin } from 'lucide-react-native';
 
 import { formatCurrency } from '@/libs/currency';
+import { formatOrderId } from '@/libs/orderId';
 import { theme } from '@/theme';
 import { OrderStatus, OrderSummary } from '@/types/order';
 
@@ -54,10 +55,11 @@ export function OrderCard({ order }: OrderCardProps) {
 
   return (
     <View style={styles.card}>
-      {/* Header dengan status badge */}
+      {/* Header dengan Order ID dan status */}
       <View style={styles.headerRow}>
         <View style={styles.headerLeft}>
-          <Calendar size={16} color={theme.colors.textSecondary} />
+          <Text style={styles.orderIdText}>#{formatOrderId(order.order_id)}</Text>
+          <Text style={styles.dateSeparator}>•</Text>
           <Text style={styles.dateText}>{formatDate(order.order_date)}</Text>
         </View>
         <View style={[styles.statusBadge, { backgroundColor: badgeBgColor }]}>
@@ -136,6 +138,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.xs,
+    flex: 1,
+  },
+  orderIdText: {
+    fontSize: theme.fontSize.sm,
+    fontWeight: theme.fontWeight.semibold,
+    color: theme.colors.text,
+  },
+  dateSeparator: {
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.textSecondary,
   },
   dateText: {
     fontSize: theme.fontSize.sm,

@@ -1,7 +1,6 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   Modal,
   RefreshControl,
@@ -16,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Search, X } from 'lucide-react-native';
 
 import { EmptyState } from '@/components/EmptyState';
+import { OrderCardSkeleton } from '@/components/SkeletonLoader';
 import { useAuth } from '@/hooks/useAuth';
 import { useOrders } from '@/hooks/useOrders';
 import { formatCurrency } from '@/libs/currency';
@@ -162,27 +162,29 @@ export default function AdminOrdersScreen() {
   );
 
   const renderFilterChips = () => (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.filterChipsContainer}
-    >
-      {statusFilters.map((filter) => {
-        const isActive = selectedStatus === filter.value;
-        return (
-          <TouchableOpacity
-            key={filter.value}
-            style={[styles.filterChip, isActive && styles.filterChipActive]}
-            onPress={() => setSelectedStatus(filter.value)}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
-              {filter.label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-    </ScrollView>
+    <View style={styles.filterChipsWrapper}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.filterChipsContainer}
+      >
+        {statusFilters.map((filter) => {
+          const isActive = selectedStatus === filter.value;
+          return (
+            <TouchableOpacity
+              key={filter.value}
+              style={[styles.filterChip, isActive && styles.filterChipActive]}
+              onPress={() => setSelectedStatus(filter.value)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
+                {filter.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+    </View>
   );
 
   if (!isAdmin) {
@@ -238,9 +240,10 @@ export default function AdminOrdersScreen() {
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         {loading && orders.length === 0 ? (
-          <View style={styles.centerContent}>
-            <ActivityIndicator color={theme.colors.primary} size="large" />
-            <Text style={styles.loadingText}>Memuat pesanan...</Text>
+          <View style={styles.skeletonContainer}>
+            <OrderCardSkeleton />
+            <OrderCardSkeleton />
+            <OrderCardSkeleton />
           </View>
         ) : (
           <FlatList
@@ -372,16 +375,21 @@ const styles = StyleSheet.create({
   },
   filterChipsContainer: {
     paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
     gap: theme.spacing.sm,
   },
+  filterChipsWrapper: {
+    backgroundColor: '#FFFFFF',
+    paddingBottom: theme.spacing.xs,
+  },
   filterChip: {
-    paddingHorizontal: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.surface,
     borderWidth: 1,
     borderColor: theme.colors.border,
+    marginRight: theme.spacing.sm,
   },
   filterChipActive: {
     backgroundColor: theme.colors.primary,
@@ -394,6 +402,10 @@ const styles = StyleSheet.create({
   },
   filterChipTextActive: {
     color: '#FFFFFF',
+  },
+  skeletonContainer: {
+    padding: theme.spacing.lg,
+    gap: theme.spacing.md,
   },
   listContent: {
     padding: theme.spacing.lg,

@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 import { EmptyState } from '@/components/EmptyState';
 import { ProductCard } from '@/components/ProductCard';
+import { ProductCardSkeleton } from '@/components/SkeletonLoader';
 import { theme } from '@/theme';
 import { Product } from '@/types/product';
 
@@ -54,6 +55,18 @@ export const ProductGridSection = ({
   );
 };
 
+const SKELETON_ITEMS = Array.from({ length: 6 }, (_, index) => index);
+
+const ProductGridSkeleton = () => (
+  <View style={styles.productGrid}>
+    {SKELETON_ITEMS.map((item) => (
+      <View key={`skeleton-${item}`} style={styles.productItem}>
+        <ProductCardSkeleton />
+      </View>
+    ))}
+  </View>
+);
+
 const styles = StyleSheet.create({
   section: {
     marginTop: 0,
@@ -91,47 +104,4 @@ const styles = StyleSheet.create({
     width: '48%',
     marginBottom: theme.spacing.lg,
   },
-  skeletonCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  skeletonImage: {
-    width: '100%',
-    height: 120,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: '#E5E7EB',
-    marginBottom: theme.spacing.sm,
-  },
-  skeletonLineShort: {
-    width: '60%',
-    height: 14,
-    borderRadius: theme.borderRadius.sm,
-    backgroundColor: '#E5E7EB',
-    marginBottom: theme.spacing.xs,
-  },
-  skeletonLineLong: {
-    width: '80%',
-    height: 14,
-    borderRadius: theme.borderRadius.sm,
-    backgroundColor: '#E5E7EB',
-  },
 });
-
-const SKELETON_ITEMS = Array.from({ length: 6 }, (_, index) => index);
-
-const ProductGridSkeleton = () => (
-  <View style={styles.productGrid}>
-    {SKELETON_ITEMS.map((item) => (
-      <View key={`skeleton-${item}`} style={styles.productItem}>
-        <View style={styles.skeletonCard}>
-          <View style={styles.skeletonImage} />
-          <View style={styles.skeletonLineShort} />
-          <View style={styles.skeletonLineLong} />
-        </View>
-      </View>
-    ))}
-  </View>
-);
