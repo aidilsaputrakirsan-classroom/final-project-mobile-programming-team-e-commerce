@@ -1,3 +1,5 @@
+import { readAsStringAsync } from 'expo-file-system/legacy';
+
 import { supabase } from './supabase.client';
 
 const BUCKET_NAME = 'products';
@@ -7,26 +9,44 @@ export interface UploadImageResult {
   path: string;
 }
 
-// Upload gambar ke Supabase Storage
+// Fungsi decode base64 ke ArrayBuffer (native implementation)
+function base64ToArrayBuffer(base64: string): ArrayBuffer {
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+// Upload gambar ke Supabase Storage (React Native compatible)
 export async function uploadProductImage(
   uri: string,
   productId: string,
 ): Promise<UploadImageResult | null> {
   try {
-    // Konversi URI ke blob
-    const response = await fetch(uri);
-    const blob = await response.blob();
+    // Baca file sebagai base64 (cara yang bekerja di React Native)
+    const base64 = await readAsStringAsync(uri, {
+      encoding: 'base64',
+    });
 
     // Generate nama file unik
-    const fileExt = uri.split('.').pop() || 'jpg';
+    const fileExt = uri.split('.').pop()?.toLowerCase() || 'jpg';
     const fileName = `${productId}-${Date.now()}.${fileExt}`;
     const filePath = `${fileName}`;
 
-    // Upload ke storage
+    // Tentukan content type
+    const contentType = fileExt === 'png' ? 'image/png' : 'image/jpeg';
+
+    // Konversi base64 ke ArrayBuffer
+    const arrayBuffer = base64ToArrayBuffer(base64);
+
+    // Upload ke storage menggunakan ArrayBuffer
     const { data, error } = await supabase.storage
       .from(BUCKET_NAME)
-      .upload(filePath, blob, {
-        contentType: `image/${fileExt}`,
+      .upload(filePath, arrayBuffer, {
+        contentType,
         upsert: true,
       });
 

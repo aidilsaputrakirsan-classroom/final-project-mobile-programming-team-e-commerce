@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as ImagePicker from 'expo-image-picker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, Image as ImageIcon, X } from 'lucide-react-native';
+import { ArrowLeft, Image as ImageIcon, X, Link as LinkIcon, Upload } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
@@ -70,6 +70,8 @@ export default function ProductFormScreen() {
   const [loading, setLoading] = useState(false);
   const [fetchingProduct, setFetchingProduct] = useState(false);
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [imageUrlInput, setImageUrlInput] = useState('');
+  const [showUrlInput, setShowUrlInput] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
@@ -197,6 +199,50 @@ export default function ProductFormScreen() {
 
   const removeImage = () => {
     setImageUri(null);
+    setImageUrlInput('');
+    setShowUrlInput(false);
+  };
+
+  // Validasi dan set image dari URL
+  const handleImageUrl = () => {
+    const trimmedUrl = imageUrlInput.trim();
+    if (!trimmedUrl) {
+      Alert.alert('Error', 'URL gambar tidak boleh kosong');
+      return;
+    }
+
+    // Validasi format URL
+    if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://')) {
+      Alert.alert('Error', 'URL harus diawali dengan http:// atau https://');
+      return;
+    }
+
+    // Cek ekstensi gambar (opsional)
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    const hasValidExtension = imageExtensions.some((ext) =>
+      trimmedUrl.toLowerCase().includes(ext),
+    );
+
+    if (!hasValidExtension && !trimmedUrl.includes('unsplash') && !trimmedUrl.includes('placeholder')) {
+      Alert.alert(
+        'Peringatan',
+        'URL mungkin bukan gambar valid. Lanjutkan?',
+        [
+          { text: 'Batal', style: 'cancel' },
+          {
+            text: 'Lanjutkan',
+            onPress: () => {
+              setImageUri(trimmedUrl);
+              setShowUrlInput(false);
+            },
+          },
+        ],
+      );
+      return;
+    }
+
+    setImageUri(trimmedUrl);
+    setShowUrlInput(false);
   };
 
   const onSubmit = async (data: ProductFormData) => {
@@ -338,9 +384,11 @@ export default function ProductFormScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Image Picker */}
+          {/* Image Picker Section */}
           <View style={styles.imageSection}>
-            <Text style={styles.label}>Gambar Produk</Text>
+            <Text style={styles.sectionTitle}>Gambar Produk</Text>
+            <Text style={styles.sectionSubtitle}>Upload gambar atau masukkan URL gambar</Text>
+            
             {imageUri ? (
               <View style={styles.imagePreviewContainer}>
                 <Image source={{ uri: imageUri }} style={styles.imagePreview} />
@@ -354,14 +402,60 @@ export default function ProductFormScreen() {
                   <Text style={styles.changeImageText}>Ganti Gambar</Text>
                 </TouchableOpacity>
               </View>
+            ) : showUrlInput ? (
+              <View style={styles.urlInputContainer}>
+                <View style={styles.urlInputWrapper}>
+                  <LinkIcon size={20} color={theme.colors.textSecondary} />
+                  <TextInput
+                    style={styles.urlInput}
+                    placeholder="https://example.com/image.jpg"
+                    placeholderTextColor={theme.colors.textSecondary}
+                    value={imageUrlInput}
+                    onChangeText={setImageUrlInput}
+                    autoCapitalize="none"
+                    keyboardType="url"
+                  />
+                </View>
+                <View style={styles.urlButtonsRow}>
+                  <TouchableOpacity
+                    style={styles.urlCancelButton}
+                    onPress={() => {
+                      setShowUrlInput(false);
+                      setImageUrlInput('');
+                    }}
+                  >
+                    <Text style={styles.urlCancelButtonText}>Batal</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.urlConfirmButton} onPress={handleImageUrl}>
+                    <Text style={styles.urlConfirmButtonText}>Gunakan URL</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             ) : (
-              <TouchableOpacity
-                style={styles.imagePlaceholder}
-                onPress={showImageOptions}
-              >
-                <ImageIcon size={40} color={theme.colors.textSecondary} />
-                <Text style={styles.imagePlaceholderText}>Tap untuk memilih gambar</Text>
-              </TouchableOpacity>
+              <View style={styles.imageOptionsContainer}>
+                <TouchableOpacity
+                  style={styles.imagePlaceholder}
+                  onPress={showImageOptions}
+                >
+                  <View style={styles.uploadIconContainer}>
+                    <Upload size={32} color={theme.colors.primary} />
+                  </View>
+                  <Text style={styles.imagePlaceholderTitle}>Upload Gambar</Text>
+                  <Text style={styles.imagePlaceholderText}>Tap untuk memilih dari galeri atau kamera</Text>
+                </TouchableOpacity>
+                <View style={styles.orDivider}>
+                  <View style={styles.dividerLine} />
+                  <Text style={styles.orText}>atau</Text>
+                  <View style={styles.dividerLine} />
+                </View>
+                <TouchableOpacity
+                  style={styles.urlOptionButton}
+                  onPress={() => setShowUrlInput(true)}
+                >
+                  <LinkIcon size={20} color={theme.colors.primary} />
+                  <Text style={styles.urlOptionText}>Masukkan URL Gambar</Text>
+                </TouchableOpacity>
+              </View>
             )}
           </View>
 
@@ -543,14 +637,15 @@ export default function ProductFormScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
+    backgroundColor: theme.colors.background,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
@@ -559,11 +654,11 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.bold,
     color: theme.colors.text,
   },
   headerRight: {
-    width: 32,
+    width: 40,
   },
   keyboardView: {
     flex: 1,
@@ -573,40 +668,143 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: theme.spacing.md,
-    paddingBottom: theme.spacing.xxl,
+    paddingBottom: 120,
   },
   imageSection: {
-    marginBottom: theme.spacing.lg,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.xl,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.md,
+    ...theme.shadows.sm,
   },
-  label: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.medium,
+  sectionTitle: {
+    fontSize: theme.fontSize.md,
+    fontWeight: theme.fontWeight.bold,
     color: theme.colors.text,
     marginBottom: theme.spacing.xs,
   },
+  sectionSubtitle: {
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.md,
+  },
+  imageOptionsContainer: {
+    gap: theme.spacing.md,
+  },
   imagePlaceholder: {
-    height: 200,
+    height: 180,
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.lg,
+    borderRadius: theme.borderRadius.xl,
     borderWidth: 2,
     borderStyle: 'dashed',
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.primary + '40',
     justifyContent: 'center',
     alignItems: 'center',
+    padding: theme.spacing.lg,
+  },
+  uploadIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: theme.borderRadius.full,
+    backgroundColor: theme.colors.primary + '15',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: theme.spacing.sm,
+  },
+  imagePlaceholderTitle: {
+    fontSize: theme.fontSize.md,
+    fontWeight: theme.fontWeight.semibold,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.xs,
   },
   imagePlaceholderText: {
-    marginTop: theme.spacing.sm,
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+  },
+  orDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: theme.colors.border,
+  },
+  orText: {
     fontSize: theme.fontSize.sm,
     color: theme.colors.textSecondary,
   },
+  urlOptionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.borderRadius.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.background,
+  },
+  urlOptionText: {
+    fontSize: theme.fontSize.md,
+    color: theme.colors.primary,
+    fontWeight: theme.fontWeight.medium,
+  },
+  urlInputContainer: {
+    gap: theme.spacing.md,
+  },
+  urlInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.lg,
+    paddingHorizontal: theme.spacing.md,
+    gap: theme.spacing.sm,
+  },
+  urlInput: {
+    flex: 1,
+    paddingVertical: theme.spacing.md,
+    fontSize: theme.fontSize.md,
+    color: theme.colors.text,
+  },
+  urlButtonsRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+  },
+  urlCancelButton: {
+    flex: 1,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.borderRadius.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+  },
+  urlCancelButtonText: {
+    fontSize: theme.fontSize.md,
+    color: theme.colors.textSecondary,
+    fontWeight: theme.fontWeight.medium,
+  },
+  urlConfirmButton: {
+    flex: 1,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.borderRadius.lg,
+    backgroundColor: theme.colors.primary,
+    alignItems: 'center',
+  },
+  urlConfirmButtonText: {
+    fontSize: theme.fontSize.md,
+    color: theme.colors.background,
+    fontWeight: theme.fontWeight.medium,
+  },
   imagePreviewContainer: {
-    position: 'relative',
     alignItems: 'center',
   },
   imagePreview: {
     width: 200,
     height: 200,
-    borderRadius: theme.borderRadius.lg,
+    borderRadius: theme.borderRadius.xl,
     backgroundColor: theme.colors.surface,
   },
   removeImageButton: {
@@ -615,16 +813,15 @@ const styles = StyleSheet.create({
     right: 70,
     backgroundColor: theme.colors.error,
     borderRadius: theme.borderRadius.full,
-    padding: 4,
+    padding: 6,
+    ...theme.shadows.sm,
   },
   changeImageButton: {
-    marginTop: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.xs,
+    marginTop: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.lg,
   },
   changeImageText: {
     fontSize: theme.fontSize.sm,
@@ -632,22 +829,31 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.medium,
   },
   formSection: {
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.xl,
+    padding: theme.spacing.lg,
     gap: theme.spacing.md,
+    ...theme.shadows.sm,
   },
   inputGroup: {
+    marginBottom: theme.spacing.xs,
+  },
+  label: {
+    fontSize: theme.fontSize.sm,
+    fontWeight: theme.fontWeight.medium,
+    color: theme.colors.text,
     marginBottom: theme.spacing.sm,
   },
   input: {
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.lg,
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
     fontSize: theme.fontSize.md,
     color: theme.colors.text,
   },
   inputError: {
+    borderWidth: 1,
     borderColor: theme.colors.error,
   },
   textArea: {
@@ -657,15 +863,13 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: theme.fontSize.xs,
     color: theme.colors.error,
-    marginTop: 4,
+    marginTop: theme.spacing.xs,
   },
   categorySelector: {
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.lg,
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
   },
   categorySelectorText: {
     fontSize: theme.fontSize.md,
@@ -675,21 +879,19 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
   },
   categoryList: {
-    marginTop: theme.spacing.xs,
+    marginTop: theme.spacing.sm,
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.lg,
     overflow: 'hidden',
   },
   categoryItem: {
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
   categoryItemSelected: {
-    backgroundColor: theme.colors.primary + '20',
+    backgroundColor: theme.colors.primary + '15',
   },
   categoryItemText: {
     fontSize: theme.fontSize.md,
@@ -701,17 +903,18 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.md,
-    paddingVertical: theme.spacing.md,
+    borderRadius: theme.borderRadius.lg,
+    paddingVertical: theme.spacing.lg,
     alignItems: 'center',
     marginTop: theme.spacing.lg,
+    ...theme.shadows.md,
   },
   submitButtonDisabled: {
-    backgroundColor: theme.colors.primary + '80',
+    backgroundColor: theme.colors.primary + '60',
   },
   submitButtonText: {
     fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.bold,
     color: theme.colors.background,
   },
   loadingButton: {
@@ -744,12 +947,12 @@ const styles = StyleSheet.create({
   backHomeButton: {
     backgroundColor: theme.colors.primary,
     paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.md,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.borderRadius.lg,
   },
   backHomeButtonText: {
     color: theme.colors.background,
     fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.medium,
+    fontWeight: theme.fontWeight.semibold,
   },
 });

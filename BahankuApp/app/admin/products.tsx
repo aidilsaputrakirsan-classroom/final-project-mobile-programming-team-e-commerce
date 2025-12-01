@@ -1,6 +1,15 @@
 import { useFocusEffect, useRouter } from 'expo-router';
-import { ArrowLeft, Plus, Search, X, Edit2, Trash2 } from 'lucide-react-native';
-import React, { useCallback, useMemo, useState } from 'react';
+import {
+  ArrowLeft,
+  Plus,
+  Search,
+  X,
+  MoreVertical,
+  Package,
+  CheckCircle,
+  AlertCircle,
+} from 'lucide-react-native';
+import React, { useCallback, useMemo, useState, useRef } from 'react';
 import {
   FlatList,
   RefreshControl,
@@ -12,6 +21,8 @@ import {
   Image,
   Alert,
   ActivityIndicator,
+  Modal,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -31,6 +42,9 @@ export default function AdminProductsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const menuPosition = useRef({ x: 0, y: 0 });
 
   const isAdmin = user?.role === 'admin';
 
@@ -77,6 +91,7 @@ export default function AdminProductsScreen() {
   };
 
   const handleDeleteProduct = (product: Product) => {
+    setMenuVisible(false);
     Alert.alert('Hapus Produk', `Apakah Anda yakin ingin menghapus "${product.name}"?`, [
       { text: 'Batal', style: 'cancel' },
       {
@@ -101,6 +116,25 @@ export default function AdminProductsScreen() {
     ]);
   };
 
+  const openMenu = (product: Product, event: { nativeEvent: { pageX: number; pageY: number } }) => {
+    menuPosition.current = { x: event.nativeEvent.pageX, y: event.nativeEvent.pageY };
+    setSelectedProduct(product);
+    setMenuVisible(true);
+  };
+
+  const handleEditFromMenu = () => {
+    if (selectedProduct) {
+      setMenuVisible(false);
+      router.push(`/admin/product-form?id=${selectedProduct.id}`);
+    }
+  };
+
+  const handleDeleteFromMenu = () => {
+    if (selectedProduct) {
+      handleDeleteProduct(selectedProduct);
+    }
+  };
+
   const renderProductItem = ({ item }: { item: Product }) => {
     const isDeleting = deletingId === item.id;
 
@@ -108,49 +142,47 @@ export default function AdminProductsScreen() {
       <View style={styles.productCard}>
         <Image
           source={{
-            uri: item.image_url || 'https://via.placeholder.com/80x80?text=No+Image',
+            uri: item.image_url || 'https://via.placeholder.com/100x100?text=No+Image',
           }}
           style={styles.productImage}
         />
         <View style={styles.productInfo}>
-          <Text style={styles.productName} numberOfLines={1}>
+          <Text style={styles.productName} numberOfLines={2}>
             {item.name}
           </Text>
+          <Text style={styles.productPrice}>{formatCurrency(item.price)}</Text>
           <Text style={styles.productCategory} numberOfLines={1}>
             {item.category || 'Tanpa Kategori'}
           </Text>
-          <Text style={styles.productPrice}>{formatCurrency(item.price)}</Text>
           <View style={styles.stockContainer}>
-            <Text
+            <View
               style={[
                 styles.stockBadge,
                 item.stock > 0 ? styles.stockAvailable : styles.stockEmpty,
               ]}
             >
-              Stok: {item.stock}
-            </Text>
+              <Text
+                style={[
+                  styles.stockText,
+                  item.stock > 0 ? styles.stockTextAvailable : styles.stockTextEmpty,
+                ]}
+              >
+                Stok {item.stock}
+              </Text>
+            </View>
           </View>
         </View>
-        <View style={styles.actionButtons}>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.editButton]}
-            onPress={() => handleEditProduct(item.id)}
-            disabled={isDeleting}
-          >
-            <Edit2 size={18} color={theme.colors.info} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.deleteButton]}
-            onPress={() => handleDeleteProduct(item)}
-            disabled={isDeleting}
-          >
-            {isDeleting ? (
-              <ActivityIndicator size="small" color={theme.colors.error} />
-            ) : (
-              <Trash2 size={18} color={theme.colors.error} />
-            )}
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={(event) => openMenu(item, event)}
+          disabled={isDeleting}
+        >
+          {isDeleting ? (
+            <ActivityIndicator size="small" color={theme.colors.textSecondary} />
+          ) : (
+            <MoreVertical size={20} color={theme.colors.textSecondary} />
+          )}
+        </TouchableOpacity>
       </View>
     );
   };
@@ -210,20 +242,23 @@ export default function AdminProductsScreen() {
         </View>
       </View>
 
-      {/* Stats */}
+      {/* Stats - Compact Modern Style */}
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
+          <Package size={18} color={theme.colors.textSecondary} />
           <Text style={styles.statValue}>{products.length}</Text>
           <Text style={styles.statLabel}>Total Produk</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>
+          <CheckCircle size={18} color={theme.colors.success} />
+          <Text style={[styles.statValue, styles.statValueSuccess]}>
             {products.filter((p) => p.stock > 0).length}
           </Text>
           <Text style={styles.statLabel}>Tersedia</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>
+          <AlertCircle size={18} color={theme.colors.error} />
+          <Text style={[styles.statValue, styles.statValueError]}>
             {products.filter((p) => p.stock === 0).length}
           </Text>
           <Text style={styles.statLabel}>Habis</Text>
@@ -270,8 +305,29 @@ export default function AdminProductsScreen() {
             />
           }
           showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
         />
       )}
+
+      {/* Action Menu Modal */}
+      <Modal
+        visible={menuVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setMenuVisible(false)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setMenuVisible(false)}>
+          <View style={styles.menuContainer}>
+            <TouchableOpacity style={styles.menuItem} onPress={handleEditFromMenu}>
+              <Text style={styles.menuItemText}>Edit Produk</Text>
+            </TouchableOpacity>
+            <View style={styles.menuDivider} />
+            <TouchableOpacity style={styles.menuItem} onPress={handleDeleteFromMenu}>
+              <Text style={[styles.menuItemText, styles.menuItemTextDanger]}>Hapus Produk</Text>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -279,14 +335,15 @@ export default function AdminProductsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
+    backgroundColor: theme.colors.background,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
@@ -295,33 +352,33 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.bold,
     color: theme.colors.text,
   },
   headerRight: {
-    width: 32,
+    width: 40,
   },
   addButton: {
     backgroundColor: theme.colors.primary,
-    padding: theme.spacing.xs,
-    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.sm,
+    borderRadius: theme.borderRadius.lg,
+    ...theme.shadows.sm,
   },
   searchContainer: {
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
+    backgroundColor: theme.colors.background,
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    paddingHorizontal: theme.spacing.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.lg,
+    paddingHorizontal: theme.spacing.md,
   },
   searchInput: {
     flex: 1,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.sm,
     fontSize: theme.fontSize.md,
     color: theme.colors.text,
@@ -331,29 +388,39 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
     gap: theme.spacing.sm,
+    backgroundColor: theme.colors.background,
   },
   statItem: {
     flex: 1,
-    backgroundColor: theme.colors.surface,
-    padding: theme.spacing.sm,
-    borderRadius: theme.borderRadius.md,
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F8F9FB',
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.sm,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: 'rgba(0,0,0,0.06)',
+    gap: 4,
   },
   statValue: {
-    fontSize: theme.fontSize.xl,
+    fontSize: theme.fontSize.lg,
     fontWeight: theme.fontWeight.bold,
-    color: theme.colors.primary,
+    color: theme.colors.text,
+    marginTop: 4,
+  },
+  statValueSuccess: {
+    color: theme.colors.success,
+  },
+  statValueError: {
+    color: theme.colors.error,
   },
   statLabel: {
     fontSize: theme.fontSize.xs,
     color: theme.colors.textSecondary,
-    marginTop: 2,
   },
   loadingContainer: {
     padding: theme.spacing.md,
-    gap: theme.spacing.sm,
+    gap: theme.spacing.md,
   },
   errorContainer: {
     flex: 1,
@@ -371,7 +438,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
     paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.md,
+    borderRadius: theme.borderRadius.lg,
   },
   retryButtonText: {
     color: theme.colors.background,
@@ -379,81 +446,105 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.medium,
   },
   listContainer: {
-    padding: theme.spacing.md,
-    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.xl,
+  },
+  separator: {
+    height: theme.spacing.md,
   },
   productCard: {
     flexDirection: 'row',
     backgroundColor: theme.colors.background,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.sm,
-    marginBottom: theme.spacing.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    ...theme.shadows.sm,
+    borderRadius: theme.borderRadius.xl,
+    padding: theme.spacing.md,
+    ...theme.shadows.md,
   },
   productImage: {
-    width: 80,
-    height: 80,
-    borderRadius: theme.borderRadius.md,
+    width: 90,
+    height: 90,
+    borderRadius: theme.borderRadius.lg,
     backgroundColor: theme.colors.surface,
   },
   productInfo: {
     flex: 1,
-    marginLeft: theme.spacing.sm,
+    marginLeft: theme.spacing.md,
     justifyContent: 'center',
   },
   productName: {
     fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.bold,
     color: theme.colors.text,
-    marginBottom: 2,
-  },
-  productCategory: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
+    lineHeight: 22,
   },
   productPrice: {
     fontSize: theme.fontSize.md,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.primary,
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
+  },
+  productCategory: {
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.sm,
   },
   stockContainer: {
     flexDirection: 'row',
   },
   stockBadge: {
-    fontSize: theme.fontSize.xs,
-    paddingHorizontal: theme.spacing.xs,
-    paddingVertical: 2,
-    borderRadius: theme.borderRadius.sm,
-    overflow: 'hidden',
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.md,
   },
   stockAvailable: {
     backgroundColor: '#D1FAE5',
-    color: '#059669',
   },
   stockEmpty: {
     backgroundColor: '#FEE2E2',
+  },
+  stockText: {
+    fontSize: theme.fontSize.xs,
+    fontWeight: theme.fontWeight.medium,
+  },
+  stockTextAvailable: {
+    color: '#059669',
+  },
+  stockTextEmpty: {
     color: '#DC2626',
   },
-  actionButtons: {
+  menuButton: {
+    padding: theme.spacing.xs,
+    alignSelf: 'flex-start',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     justifyContent: 'center',
-    gap: theme.spacing.xs,
+    alignItems: 'center',
   },
-  actionButton: {
-    padding: theme.spacing.sm,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
+  menuContainer: {
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.xl,
+    width: 200,
+    overflow: 'hidden',
+    ...theme.shadows.lg,
   },
-  editButton: {
-    borderColor: theme.colors.info,
-    backgroundColor: '#EFF6FF',
+  menuItem: {
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
   },
-  deleteButton: {
-    borderColor: theme.colors.error,
-    backgroundColor: '#FEF2F2',
+  menuItemText: {
+    fontSize: theme.fontSize.md,
+    color: theme.colors.text,
+    textAlign: 'center',
+  },
+  menuItemTextDanger: {
+    color: theme.colors.error,
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: theme.colors.border,
   },
   notAdminContainer: {
     flex: 1,
@@ -470,12 +561,12 @@ const styles = StyleSheet.create({
   backHomeButton: {
     backgroundColor: theme.colors.primary,
     paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.md,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.borderRadius.lg,
   },
   backHomeButtonText: {
     color: theme.colors.background,
     fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.medium,
+    fontWeight: theme.fontWeight.semibold,
   },
 });
