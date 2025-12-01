@@ -11,9 +11,11 @@ Telah berhasil melakukan restore file-file backend yang hilang setelah `git stas
 ## File-File yang Dipulihkan
 
 ### 1. Backend Files (Baru Dibuat)
+
 Karena file-file ini tidak ditemukan dalam git history, saya telah membuat ulang berdasarkan struktur yang logis:
 
 #### ✅ `BahankuApp/src/store/cart.store.ts`
+
 - Zustand store untuk manajemen shopping cart
 - Features:
   - Add item ke cart (dengan merge quantity jika sudah ada)
@@ -24,6 +26,7 @@ Karena file-file ini tidak ditemukan dalam git history, saya telah membuat ulang
   - Persistent storage dengan localStorage
 
 #### ✅ `BahankuApp/src/hooks/useOrders.ts`
+
 - React hook untuk fetch dan manage orders
 - Features:
   - Auto-fetch orders saat user login
@@ -33,6 +36,7 @@ Karena file-file ini tidak ditemukan dalam git history, saya telah membuat ulang
   - Integration dengan Supabase
 
 #### ✅ `BahankuApp/src/types/order.ts`
+
 - Type definitions untuk Order dan OrderItem
 - Interfaces:
   - `OrderItem` - item dalam order
@@ -40,24 +44,31 @@ Karena file-file ini tidak ditemukan dalam git history, saya telah membuat ulang
   - `CreateOrderPayload` - payload untuk create order
 
 ### 2. Type Exports (Sudah Ada)
+
 ✅ `BahankuApp/src/types/index.ts`
+
 - Sudah mengexport `./order` types
 - Tidak perlu perubahan
 
 ### 3. Documentation Files (Di-restore dari HEAD)
+
 ✅ Restored files:
+
 - `Development_Checklist_BahanKu.md`
 - `PRD_BahanKu.md`
 - `Rencana_Pembagian_Tugas_BahanKu.md`
 
 ## File-File yang Tidak Disentuh
+
 ✅ `adam_share/` folder - tetap utuh (16 items)
+
 - UI components untuk Adam
 - QuantityStepper, CartItemRow, dan components lainnya
 
 ## Status Git
 
 ### Untracked Files (Ready for Staging)
+
 ```
 BahankuApp/src/components/QuantityStepper.tsx
 BahankuApp/src/components/cart/
@@ -68,6 +79,7 @@ BahankuApp/src/types/order.ts
 ```
 
 ### Documentation Files
+
 ```
 Development_Checklist_BahanKu.md
 PRD_BahanKu.md
@@ -105,5 +117,6 @@ Penelitian git history menunjukkan bahwa file-file backend (cart.store.ts, useOr
 Jika konten file sebelumnya berbeda, silakan update file-file ini sesuai kebutuhan.
 
 ---
+
 **Status:** ✅ Restore Selesai | Siap untuk staging dan commit  
 **Next:** Pangeran melakukan review dan push

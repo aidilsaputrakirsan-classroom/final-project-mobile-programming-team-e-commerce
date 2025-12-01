@@ -1,4 +1,5 @@
 import { useFocusEffect, useRouter } from 'expo-router';
+import { Search, X } from 'lucide-react-native';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   View,
@@ -12,7 +13,6 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Search, X } from 'lucide-react-native';
 
 import { EmptyState } from '@/components/EmptyState';
 import { OrderCard } from '@/components/orders';
@@ -112,7 +112,9 @@ export default function OrdersScreen() {
               onPress={() => setSelectedStatus(filter.value)}
               activeOpacity={0.7}
             >
-              <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
+              <Text
+                style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
+              >
                 {filter.label}
               </Text>
             </TouchableOpacity>
@@ -160,7 +162,10 @@ export default function OrdersScreen() {
               onChangeText={setSearchQuery}
             />
             {searchQuery ? (
-              <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
+              <TouchableOpacity
+                onPress={() => setSearchQuery('')}
+                style={styles.clearButton}
+              >
                 <X size={18} color={theme.colors.textSecondary} />
               </TouchableOpacity>
             ) : null}
@@ -186,7 +191,11 @@ export default function OrdersScreen() {
             ItemSeparatorComponent={() => <View style={styles.separator} />}
             ListEmptyComponent={
               <EmptyState
-                title={searchQuery || selectedStatus !== 'semua' ? 'Tidak ditemukan' : 'Belum ada pesanan'}
+                title={
+                  searchQuery || selectedStatus !== 'semua'
+                    ? 'Tidak ditemukan'
+                    : 'Belum ada pesanan'
+                }
                 message={
                   searchQuery || selectedStatus !== 'semua'
                     ? 'Coba ubah filter atau kata kunci pencarian'

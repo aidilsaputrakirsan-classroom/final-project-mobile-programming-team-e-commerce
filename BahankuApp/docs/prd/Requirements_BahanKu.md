@@ -5,19 +5,23 @@
 **BahanKu** adalah aplikasi mobile e-commerce berbasis React Native (Expo) yang memungkinkan pengguna membeli bahan dapur secara online dari single-seller. Aplikasi ini dibangun dengan fokus pada pengalaman pengguna yang intuitif, performa tinggi, dan integrasi penuh dengan Supabase sebagai backend (PostgreSQL, Auth, Storage).
 
 **Target Platform:**
+
 - Android (desain utama)
 - iOS (kompatibel via Expo Go)
 
 **Persona Utama:**
+
 1. **Customer** — Pengguna yang ingin membeli bahan dapur dan mencari inspirasi resep
 2. **Admin (Superadmin)** — Pengelola yang mengatur produk, kategori, dan status pesanan
 
 **Nilai Bisnis:**
+
 - Menyediakan solusi belanja bahan dapur yang cepat dan terpercaya
 - Memberikan inspirasi resep yang terintegrasi dengan produk yang dijual
 - Mengurangi kompleksitas backend dengan memanfaatkan Supabase sebagai BaaS (Backend-as-a-Service)
 
 **Asumsi dan Batasan:**
+
 - Aplikasi hanya mendukung satu penjual (single-seller)
 - Pembayaran menggunakan metode COD (Cash on Delivery) atau transfer manual (fase awal)
 - Data produk, pesanan, dan resep tersimpan di Supabase PostgreSQL

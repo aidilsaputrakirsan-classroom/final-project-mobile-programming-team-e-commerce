@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { Square, CheckSquare, MinusSquare } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';
 import {
   View,
@@ -15,15 +16,14 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Square, CheckSquare, MinusSquare } from 'lucide-react-native';
 
 import { CartItemRow } from '@/components/cart';
 import { EmptyState } from '@/components/EmptyState';
+import { useAuth } from '@/hooks/useAuth';
+import { useOrders } from '@/hooks/useOrders';
 import { formatCurrency } from '@/libs/currency';
 import { CartItem, useCartStore } from '@/store/cart.store';
 import { theme } from '@/theme';
-import { useAuth } from '@/hooks/useAuth';
-import { useOrders } from '@/hooks/useOrders';
 
 export default function CartScreen() {
   const router = useRouter();
@@ -31,7 +31,6 @@ export default function CartScreen() {
   const items = useCartStore((state) => state.items);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
-  const clearCart = useCartStore((state) => state.clearCart);
   const toggleSelection = useCartStore((state) => state.toggleSelection);
   const selectAll = useCartStore((state) => state.selectAll);
   const unselectAll = useCartStore((state) => state.unselectAll);
@@ -46,19 +45,20 @@ export default function CartScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [addressError, setAddressError] = useState<string | null>(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const selectedItems = useMemo(() => getSelectedItems(), [items]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const selectedTotal = useMemo(() => getSelectedTotal(), [items]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const selectedCount = useMemo(() => getSelectedItemCount(), [items]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const selectedItemsCount = useMemo(() => getSelectedItemsCount(), [items]);
   const totalItemsCount = items.length;
   const allSelected = useMemo(
     () => items.length > 0 && items.every((item) => item.selected),
     [items],
   );
-  const someSelected = useMemo(
-    () => items.some((item) => item.selected),
-    [items],
-  );
+  const someSelected = useMemo(() => items.some((item) => item.selected), [items]);
 
   const handleRemoveItem = (item: CartItem) => {
     Alert.alert(
@@ -123,7 +123,7 @@ export default function CartScreen() {
 
       // Hapus hanya item yang sudah di-checkout dari cart
       selectedItems.forEach((item) => removeItem(item.product.id));
-      
+
       setCheckoutVisible(false);
       setShippingAddress('');
       setAddressError(null);
@@ -136,8 +136,7 @@ export default function CartScreen() {
         { text: 'Tutup', style: 'cancel' },
       ]);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Checkout gagal diproses.';
+      const message = err instanceof Error ? err.message : 'Checkout gagal diproses.';
       Alert.alert('Checkout Gagal', message);
     } finally {
       setSubmitting(false);
@@ -272,10 +271,7 @@ export default function CartScreen() {
 
               <Text style={styles.inputLabel}>Alamat Pengiriman</Text>
               <TextInput
-                style={[
-                  styles.textInput,
-                  addressError && styles.textInputError,
-                ]}
+                style={[styles.textInput, addressError && styles.textInputError]}
                 placeholder="Masukkan alamat lengkap"
                 placeholderTextColor={theme.colors.textSecondary}
                 value={shippingAddress}

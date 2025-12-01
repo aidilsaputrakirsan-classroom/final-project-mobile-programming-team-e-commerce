@@ -11,11 +11,13 @@
 Setelah policy "Admin can view all users" ditambahkan di response sebelumnya, aplikasi mengalami error **PostgreSQL 42P17: infinite recursion in policy for relation `users`**.
 
 ### Error Details
+
 ```
 ERROR: 42P17: infinite recursion detected in policy for relation "users"
 ```
 
 Error terjadi ketika:
+
 - Memanggil `supabase.from('users').select()`
 - Menggunakan view `v_order_details` yang JOIN dengan tabel `users`
 - Memanggil `loadUserProfile()` atau `fetchAllOrders()`
@@ -32,7 +34,7 @@ FOR SELECT
 USING (
   EXISTS (
     SELECT 1 FROM public.users u  -- ❌ RECURSION HERE!
-    WHERE u.id = auth.uid() 
+    WHERE u.id = auth.uid()
     AND u.role = 'admin'
   )
 );
@@ -71,7 +73,7 @@ BEGIN
   SELECT role INTO user_role
   FROM public.users
   WHERE id = auth.uid();
-  
+
   -- Return true if user is admin, false otherwise
   RETURN COALESCE(user_role = 'admin', false);
 END;
@@ -79,6 +81,7 @@ $$;
 ```
 
 **Key Features:**
+
 - ✅ `SECURITY DEFINER` - Function runs with privileges of function owner (postgres), **bypassing RLS**
 - ✅ `SET search_path = public` - Security best practice, prevents search_path attacks
 - ✅ Direct query ke `users` table tanpa memicu RLS lagi
@@ -163,7 +166,7 @@ SELECT COUNT(*) FROM v_order_details;
 ### Test 2: All Tables Accessible ✅
 
 ```sql
-SELECT 
+SELECT
   (SELECT COUNT(*) FROM users) as users_count,
   (SELECT COUNT(*) FROM orders) as orders_count,
   (SELECT COUNT(*) FROM order_items) as order_items_count,
@@ -172,6 +175,7 @@ SELECT
 ```
 
 **Results:**
+
 - Users: 4
 - Orders: 17
 - Order Items: 21
@@ -183,7 +187,7 @@ SELECT
 ### Test 3: View Data Integrity ✅
 
 ```sql
-SELECT 
+SELECT
   order_id,
   customer_name,
   customer_email,
@@ -196,13 +200,13 @@ LIMIT 5;
 
 **Sample Results:**
 
-| Order ID | Customer Name | Email | Total Price | Status |
-|----------|--------------|-------|-------------|---------|
-| 2b6b49a4... | Pangeran | pang@gmail.com | Rp 50,000 | diproses |
-| 006b575c... | Administrator | admin@bahanku.app | Rp 1,100,000 | diproses |
-| 32678cfd... | Tester | tester@123.com | Rp 64,000 | dikirim |
-| 0e6042d5... | Pangeran | pang@gmail.com | Rp 86,000 | diproses |
-| b981fb0c... | Adam Ibnu ramadhan | adamibnu02@gmail.com | Rp 155,000 | diproses |
+| Order ID    | Customer Name      | Email                | Total Price  | Status   |
+| ----------- | ------------------ | -------------------- | ------------ | -------- |
+| 2b6b49a4... | Pangeran           | pang@gmail.com       | Rp 50,000    | diproses |
+| 006b575c... | Administrator      | admin@bahanku.app    | Rp 1,100,000 | diproses |
+| 32678cfd... | Tester             | tester@123.com       | Rp 64,000    | dikirim  |
+| 0e6042d5... | Pangeran           | pang@gmail.com       | Rp 86,000    | diproses |
+| b981fb0c... | Adam Ibnu ramadhan | adamibnu02@gmail.com | Rp 155,000   | diproses |
 
 **Status:** ✅ Customer names and emails properly joined (no NULL values)
 
@@ -217,13 +221,13 @@ ORDER BY tablename, policyname;
 
 **Results:**
 
-| Table | Policy Name | Command | Condition |
-|-------|------------|---------|-----------|
-| order_items | Admin can view all order items | SELECT | `is_admin()` |
-| orders | Admin can update all orders | UPDATE | `is_admin()` |
-| orders | Admin can view all orders | SELECT | `is_admin()` |
-| products | Products manageable by admin only | ALL | `is_admin()` |
-| users | Admin can view all users | SELECT | `is_admin()` |
+| Table       | Policy Name                       | Command | Condition    |
+| ----------- | --------------------------------- | ------- | ------------ |
+| order_items | Admin can view all order items    | SELECT  | `is_admin()` |
+| orders      | Admin can update all orders       | UPDATE  | `is_admin()` |
+| orders      | Admin can view all orders         | SELECT  | `is_admin()` |
+| products    | Products manageable by admin only | ALL     | `is_admin()` |
+| users       | Admin can view all users          | SELECT  | `is_admin()` |
 
 **Status:** ✅ All 5 admin policies now use the helper function
 
@@ -232,16 +236,18 @@ ORDER BY tablename, policyname;
 ## How It Works
 
 ### Before (Recursive)
+
 ```
 User queries users table
   → Policy checks: "is user admin?"
     → Policy queries users table to check role
-      → Policy checks: "is user admin?" 
+      → Policy checks: "is user admin?"
         → Policy queries users table...
           → ♾️ INFINITE RECURSION!
 ```
 
 ### After (Non-Recursive)
+
 ```
 User queries users table
   → Policy checks: is_admin()
@@ -282,25 +288,31 @@ User queries users table
 ### What Could Go Wrong? (Threat Model)
 
 ❌ **Attack: Try to call is_admin() as non-admin**
+
 ```sql
 -- Attacker tries to fool the system
 SELECT public.is_admin();
 -- Result: false (auth.uid() returns their own ID, role is 'user')
 ```
+
 ✅ **Prevented:** Function checks actual database role
 
 ❌ **Attack: Try to inject malicious code**
+
 ```sql
 -- Attacker tries SQL injection
 SELECT * FROM users WHERE id = '...'; DROP TABLE users; --'
 ```
+
 ✅ **Prevented:** Function uses parameterized query with auth.uid()
 
 ❌ **Attack: Try to bypass RLS directly**
+
 ```sql
 -- Attacker tries to query without auth
 SELECT * FROM users;
 ```
+
 ✅ **Prevented:** RLS still active, is_admin() returns false for NULL auth.uid()
 
 ---
@@ -328,7 +340,7 @@ BEGIN
   SELECT role INTO user_role
   FROM public.users
   WHERE id = auth.uid();
-  
+
   RETURN COALESCE(user_role = 'admin', false);
 END;
 $$;
@@ -407,6 +419,7 @@ USING (public.is_admin());
 **Answer:** Minimal impact.
 
 1. **Function is STABLE** (could be marked as such for optimization)
+
    ```sql
    -- Optional optimization
    ALTER FUNCTION public.is_admin() STABLE;
@@ -425,6 +438,7 @@ USING (public.is_admin());
 ### Benchmarking
 
 Typical performance:
+
 - Function call: ~0.1ms
 - Policy evaluation: ~0.2ms
 - Total overhead: **< 1ms per query**
@@ -436,17 +450,20 @@ Typical performance:
 If you already have users logged in:
 
 ### 1. No Code Changes Required ✅
+
 - Backend fix only
 - No frontend changes needed
 - No migration of user data
 
 ### 2. Users May Need to Refresh Token
+
 ```typescript
 // Optional: Force token refresh in app
 const { data, error } = await supabase.auth.refreshSession();
 ```
 
 ### 3. Clear Browser Cache (If Issues Persist)
+
 ```typescript
 // In app startup code
 localStorage.clear(); // Clear all cached data
@@ -461,17 +478,19 @@ await supabase.auth.signOut();
 ### If Recursion Error Still Occurs
 
 1. **Verify function exists**
+
    ```sql
-   SELECT proname, prosecdef 
-   FROM pg_proc 
+   SELECT proname, prosecdef
+   FROM pg_proc
    WHERE proname = 'is_admin';
    -- Should return 1 row with prosecdef = true
    ```
 
 2. **Check function owner**
+
    ```sql
    SELECT proname, proowner, pg_get_userbyid(proowner) as owner
-   FROM pg_proc 
+   FROM pg_proc
    WHERE proname = 'is_admin';
    -- Owner should be 'postgres' or superuser
    ```
@@ -487,14 +506,16 @@ await supabase.auth.signOut();
 ### If Admin Can't See All Users
 
 1. **Check admin role**
+
    ```sql
-   SELECT id, email, role 
-   FROM users 
+   SELECT id, email, role
+   FROM users
    WHERE email = 'admin@bahanku.app';
    -- Should show role = 'admin'
    ```
 
 2. **Test function directly**
+
    ```sql
    -- As admin user
    SELECT public.is_admin();
@@ -503,8 +524,8 @@ await supabase.auth.signOut();
 
 3. **Check policy is active**
    ```sql
-   SELECT * FROM pg_policies 
-   WHERE tablename = 'users' 
+   SELECT * FROM pg_policies
+   WHERE tablename = 'users'
    AND policyname = 'Admin can view all users';
    -- Should return 1 row
    ```
@@ -516,6 +537,7 @@ await supabase.auth.signOut();
 ### ✅ DO: Use SECURITY DEFINER for RLS Helper Functions
 
 When you need to check user properties within RLS policies:
+
 - Create a SECURITY DEFINER function
 - Make it simple and read-only
 - Use `SET search_path` for security
@@ -524,6 +546,7 @@ When you need to check user properties within RLS policies:
 ### ❌ DON'T: Query Same Table in RLS Policy
 
 Never do this:
+
 ```sql
 -- BAD: Causes recursion
 CREATE POLICY "example"
@@ -532,9 +555,10 @@ USING (EXISTS (SELECT 1 FROM table_a WHERE ...));
 ```
 
 Instead:
+
 ```sql
 -- GOOD: Use helper function
-CREATE POLICY "example"  
+CREATE POLICY "example"
 ON table_a
 USING (helper_function());
 ```
@@ -549,6 +573,7 @@ USING (helper_function());
 ### ✅ DO: Test with Real User Context
 
 Test policies with actual authenticated users:
+
 ```sql
 -- Set auth context
 SET request.jwt.claims TO '{"sub": "user-id-here"}';
@@ -569,7 +594,7 @@ RESET request.jwt.claims;
 ✅ **Performance:** Minimal overhead (< 1ms per query)  
 ✅ **Security:** Safe implementation with proper safeguards  
 ✅ **Verification:** All 17 orders visible, no recursion errors  
-✅ **Backward Compatible:** No breaking changes, existing functionality intact  
+✅ **Backward Compatible:** No breaking changes, existing functionality intact
 
 The RLS system is now working correctly without recursion! 🎉
 
@@ -578,12 +603,14 @@ The RLS system is now working correctly without recursion! 🎉
 ## Next Steps
 
 ### Immediate Actions
+
 1. ✅ Deploy to production (already applied)
 2. [ ] Test in application (frontend)
 3. [ ] Monitor logs for any issues
 4. [ ] Document for team
 
 ### Future Improvements
+
 - [ ] Add `STABLE` attribute to `is_admin()` for optimization
 - [ ] Create similar helpers for other role checks (if needed)
 - [ ] Add function tests in CI/CD pipeline

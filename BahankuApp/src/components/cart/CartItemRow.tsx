@@ -1,12 +1,11 @@
+import { Trash2 } from 'lucide-react-native';
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 
-import { Trash2 } from 'lucide-react-native';
-
 import { QuantityStepper } from '@/components/QuantityStepper';
 import { formatCurrency } from '@/libs/currency';
-import { theme } from '@/theme';
 import { CartItem } from '@/store/cart.store';
+import { theme } from '@/theme';
 
 interface CartItemRowProps {
   item: CartItem;
@@ -15,7 +14,12 @@ interface CartItemRowProps {
   onToggleSelect: () => void;
 }
 
-export function CartItemRow({ item, onQuantityChange, onRemove, onToggleSelect }: CartItemRowProps) {
+export function CartItemRow({
+  item,
+  onQuantityChange,
+  onRemove,
+  onToggleSelect,
+}: CartItemRowProps) {
   const { product, quantity, selected } = item;
   const subtotal = product.price * quantity;
   const maxQuantity = Math.max(1, product.stock);
@@ -31,7 +35,11 @@ export function CartItemRow({ item, onQuantityChange, onRemove, onToggleSelect }
       onPress={onToggleSelect}
       activeOpacity={0.7}
       accessibilityRole="button"
-      accessibilityLabel={selected ? `${product.name} terpilih, tap untuk batalkan` : `${product.name} tidak terpilih, tap untuk memilih`}
+      accessibilityLabel={
+        selected
+          ? `${product.name} terpilih, tap untuk batalkan`
+          : `${product.name} tidak terpilih, tap untuk memilih`
+      }
     >
       <Image
         source={{
@@ -64,7 +72,11 @@ export function CartItemRow({ item, onQuantityChange, onRemove, onToggleSelect }
 
         <View style={styles.footer}>
           <View onStartShouldSetResponder={() => true}>
-            <QuantityStepper value={quantity} max={maxQuantity} onChange={onQuantityChange} />
+            <QuantityStepper
+              value={quantity}
+              max={maxQuantity}
+              onChange={onQuantityChange}
+            />
           </View>
 
           <View style={styles.subtotalContainer}>

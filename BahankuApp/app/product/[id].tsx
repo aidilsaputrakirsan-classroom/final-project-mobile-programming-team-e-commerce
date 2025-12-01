@@ -138,7 +138,11 @@ export default function ProductDetailScreen() {
           {product.stock > 0 && (
             <View style={styles.quantityContainer}>
               <Text style={styles.sectionTitle}>Jumlah</Text>
-              <QuantityStepper value={quantity} max={product.stock} onChange={setQuantity} />
+              <QuantityStepper
+                value={quantity}
+                max={product.stock}
+                onChange={setQuantity}
+              />
             </View>
           )}
         </View>

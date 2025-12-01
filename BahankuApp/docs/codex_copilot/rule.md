@@ -16,8 +16,8 @@ docs/codex_copilot/
 ## Penamaan
 
 - `YYYYMMDD` : tanggal UTC
-- `HHmm`     : jam + menit UTC (opsional jika tidak ada)
-- `topic`    : slug singkat (kebab-case)
+- `HHmm` : jam + menit UTC (opsional jika tidak ada)
+- `topic` : slug singkat (kebab-case)
 - suffix `-request` untuk instruksi, `-response` untuk hasil
 - Format file:
   - Request otomatis → `.json`
@@ -27,6 +27,7 @@ docs/codex_copilot/
 ## Konten Request
 
 Minimal mencakup:
+
 1. `from` – siapa yang meminta (Codex / Copilot / Pangeran / Adam)
 2. `context` – latar belakang singkat
 3. `instructions` – array judul + langkah langkah detail
@@ -36,6 +37,7 @@ Minimal mencakup:
 ## Konten Response
 
 Wajib ada:
+
 - Judul + timestamp
 - Ringkasan tindakan
 - Status tiap poin (✅/⚠️/❌)

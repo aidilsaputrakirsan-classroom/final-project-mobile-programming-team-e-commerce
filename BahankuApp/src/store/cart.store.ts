@@ -61,7 +61,11 @@ export const useCartStore = create<CartState>()(
             return {
               items: [
                 ...state.items,
-                { product, quantity: clampQuantity(quantity, product.stock), selected: true },
+                {
+                  product,
+                  quantity: clampQuantity(quantity, product.stock),
+                  selected: true,
+                },
               ],
             };
           }
@@ -82,9 +86,9 @@ export const useCartStore = create<CartState>()(
           items: state.items.map((item) =>
             item.product.id === productId
               ? {
-                ...item,
-                quantity: clampQuantity(quantity, item.product.stock),
-              }
+                  ...item,
+                  quantity: clampQuantity(quantity, item.product.stock),
+                }
               : item,
           ),
         }));
@@ -97,9 +101,7 @@ export const useCartStore = create<CartState>()(
       toggleSelection: (productId) => {
         set((state) => ({
           items: state.items.map((item) =>
-            item.product.id === productId
-              ? { ...item, selected: !item.selected }
-              : item
+            item.product.id === productId ? { ...item, selected: !item.selected } : item,
           ),
         }));
       },
@@ -125,15 +127,13 @@ export const useCartStore = create<CartState>()(
             item.selected ? total + item.product.price * item.quantity : total,
           0,
         ),
-      getItemCount: () =>
-        get().items.reduce((total, item) => total + item.quantity, 0),
+      getItemCount: () => get().items.reduce((total, item) => total + item.quantity, 0),
       getSelectedItemCount: () =>
         get().items.reduce(
           (total, item) => (item.selected ? total + item.quantity : total),
           0,
         ),
-      getSelectedItemsCount: () =>
-        get().items.filter((item) => item.selected).length,
+      getSelectedItemsCount: () => get().items.filter((item) => item.selected).length,
       getSelectedItems: () => get().items.filter((item) => item.selected),
     }),
     {

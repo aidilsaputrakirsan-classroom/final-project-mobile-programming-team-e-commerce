@@ -15,12 +15,14 @@ Admin account telah berhasil dibuat di Supabase dan siap untuk pengujian flow `a
 ## 1. Akun Admin yang Dibuat
 
 ### Kredensial Login
+
 - **Email:** `admin@bahanku.app`
 - **Password:** `Admin123@`
 - **Role:** `admin`
 - **Display Name:** `Administrator`
 
 ### Detail Teknis
+
 - **Auth User ID:** `5345bbdd-6956-4377-b170-b8ab3db0e09f`
 - **Created At:** `2025-11-24 02:52:04 UTC`
 - **Status:** Active & Email Confirmed
@@ -30,21 +32,27 @@ Admin account telah berhasil dibuat di Supabase dan siap untuk pengujian flow `a
 ## 2. Langkah-Langkah yang Dilakukan
 
 ### A. Membuat Auth User
+
 ✅ User berhasil dibuat di `auth.users` dengan:
+
 - Email: `admin@bahanku.app`
 - Password terenkripsi menggunakan bcrypt
 - Metadata: `{"name": "Administrator", "display_name": "Administrator"}`
 - Email automatically confirmed untuk kemudahan testing
 
 ### B. Entry di Public Users Table
+
 ✅ Record berhasil dibuat di `public.users` dengan:
+
 - ID yang sama dengan auth user ID
 - Role: `admin`
 - Name: `Administrator`
 - Email: `admin@bahanku.app`
 
 ### C. Verifikasi RLS Policies
+
 ✅ RLS policies sudah terkonfigurasi dengan benar:
+
 - **Admin can view all orders** - Policy untuk SELECT semua orders
 - **Admin can update all orders** - Policy untuk UPDATE semua orders
 - Policies memeriksa role 'admin' dari tabel `public.users`
@@ -56,6 +64,7 @@ Admin account telah berhasil dibuat di Supabase dan siap untuk pengujian flow `a
 Berhasil membuat 2 pesanan dummy untuk memperkaya data testing:
 
 ### Order 1 (Status: Diproses)
+
 - **User:** Pangeran (`pang@gmail.com`)
 - **Total:** Rp 86,000
 - **Items:**
@@ -65,6 +74,7 @@ Berhasil membuat 2 pesanan dummy untuk memperkaya data testing:
 - **Order ID:** `0e6042d5-c3e4-4d97-89bf-8827e6804aac`
 
 ### Order 2 (Status: Dikirim)
+
 - **User:** Tester (`tester@123.com`)
 - **Total:** Rp 64,000
 - **Items:**
@@ -91,6 +101,7 @@ Setelah pembuatan dummy orders, berikut adalah statistik orders:
 ## 5. Cara Testing Admin Account
 
 ### Login ke Aplikasi
+
 ```typescript
 // Gunakan kredensial berikut di halaman login
 Email: admin@bahanku.app
@@ -98,13 +109,17 @@ Password: Admin123@
 ```
 
 ### Akses Admin Orders Page
+
 Setelah login sebagai admin, navigasi ke:
+
 ```
 app/admin/orders.tsx
 ```
 
 ### Yang Harus Terlihat
+
 Admin seharusnya dapat:
+
 1. ✅ Melihat **SEMUA** pesanan dari semua customer (bukan hanya miliknya)
 2. ✅ Melihat 15 total orders dari 3 customers berbeda
 3. ✅ Melihat detail lengkap setiap order termasuk:
@@ -119,6 +134,7 @@ Admin seharusnya dapat:
 ## 6. Valid Order Statuses
 
 Untuk referensi, status yang valid untuk orders:
+
 - `diproses` - Order sedang diproses
 - `dikirim` - Order sedang dalam pengiriman
 - `selesai` - Order telah selesai
@@ -129,12 +145,14 @@ Untuk referensi, status yang valid untuk orders:
 ## 7. Security Notes
 
 ### RLS Implementation
+
 - ✅ Row Level Security sudah aktif di tabel `orders`
 - ✅ Regular users hanya bisa melihat/update orders mereka sendiri
 - ✅ Admin dapat melihat/update SEMUA orders
 - ✅ Policy validation dilakukan berdasarkan `auth.uid()` dan `users.role`
 
 ### Password Security
+
 - Password `Admin123@` adalah password **SEMENTARA** untuk development
 - 🔐 **WAJIB** diganti jika aplikasi masuk production
 - Password tersimpan terenkripsi dengan bcrypt di database
@@ -144,11 +162,13 @@ Untuk referensi, status yang valid untuk orders:
 ## 8. Troubleshooting
 
 ### Jika Admin Tidak Bisa Login
+
 1. Cek apakah `supabase.client.ts` sudah dikonfigurasi dengan benar
 2. Pastikan environment variables Supabase sudah di-set
 3. Cek console log untuk error messages
 
 ### Jika Admin Tidak Melihat Semua Orders
+
 1. Verifikasi RLS policies masih aktif:
    ```sql
    SELECT * FROM pg_policies WHERE tablename = 'orders';
@@ -159,9 +179,11 @@ Untuk referensi, status yang valid untuk orders:
    ```
 
 ### Jika Perlu Reset Password
+
 Gunakan SQL berikut (ganti dengan password baru):
+
 ```sql
-UPDATE auth.users 
+UPDATE auth.users
 SET encrypted_password = crypt('PasswordBaru123@', gen_salt('bf'))
 WHERE email = 'admin@bahanku.app';
 ```
@@ -171,6 +193,7 @@ WHERE email = 'admin@bahanku.app';
 ## 9. Next Steps
 
 ### Testing Checklist
+
 - [ ] Login dengan akun admin
 - [ ] Verifikasi dapat melihat semua 15 orders
 - [ ] Test update status order
@@ -178,6 +201,7 @@ WHERE email = 'admin@bahanku.app';
 - [ ] Test filter & search functionality (jika ada)
 
 ### Future Improvements
+
 - [ ] Tambahkan logging untuk admin actions
 - [ ] Implement admin dashboard dengan statistik
 - [ ] Tambahkan bulk actions untuk orders

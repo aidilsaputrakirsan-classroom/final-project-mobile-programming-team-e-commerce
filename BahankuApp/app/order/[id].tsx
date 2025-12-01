@@ -1,4 +1,14 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import {
+  ArrowLeft,
+  MessageCircle,
+  Package,
+  ChevronDown,
+  ChevronUp,
+  MapPin,
+  HelpCircle,
+  RotateCcw,
+} from 'lucide-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -14,17 +24,6 @@ import {
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  ArrowLeft,
-  Copy,
-  MessageCircle,
-  Package,
-  ChevronDown,
-  ChevronUp,
-  MapPin,
-  HelpCircle,
-  RotateCcw,
-} from 'lucide-react-native';
 
 import { EmptyState } from '@/components/EmptyState';
 import { StatusTimeline } from '@/components/orders';
@@ -49,7 +48,7 @@ const statusLabel: Record<OrderSummary['status'], string> = {
   dibatalkan: 'Dibatalkan',
 };
 
-const formatDate = (isoDate?: string) => {
+const _formatDate = (isoDate?: string) => {
   if (!isoDate) return '-';
   try {
     return new Date(isoDate).toLocaleString('id-ID', {
@@ -107,8 +106,7 @@ export default function OrderDetailScreen() {
       }
       setOrder(detail);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Gagal memuat detail pesanan';
+      const message = err instanceof Error ? err.message : 'Gagal memuat detail pesanan';
       setDetailError(message);
     }
   }, [getOrderById, orderId]);
@@ -134,20 +132,16 @@ export default function OrderDetailScreen() {
   };
 
   const handleContactAdmin = () => {
-    Alert.alert(
-      'Hubungi Admin',
-      'Pilih metode untuk menghubungi admin',
-      [
-        {
-          text: 'WhatsApp',
-          onPress: () => {
-            const whatsappUrl = 'https://wa.me/6281234567890';
-            Linking.openURL(whatsappUrl);
-          },
+    Alert.alert('Hubungi Admin', 'Pilih metode untuk menghubungi admin', [
+      {
+        text: 'WhatsApp',
+        onPress: () => {
+          const whatsappUrl = 'https://wa.me/6281234567890';
+          Linking.openURL(whatsappUrl);
         },
-        { text: 'Batal', style: 'cancel' },
-      ],
-    );
+      },
+      { text: 'Batal', style: 'cancel' },
+    ]);
   };
 
   const handleComingSoon = (feature: string) => {
@@ -156,10 +150,17 @@ export default function OrderDetailScreen() {
 
   // Render product item
   const renderItem = (item: OrderItemDetail, isLast: boolean) => (
-    <View key={item.product_id} style={[styles.productItem, !isLast && styles.productItemBorder]}>
+    <View
+      key={item.product_id}
+      style={[styles.productItem, !isLast && styles.productItemBorder]}
+    >
       <View style={styles.productImageContainer}>
         {item.image_url ? (
-          <Image source={{ uri: item.image_url }} style={styles.productImage} resizeMode="cover" />
+          <Image
+            source={{ uri: item.image_url }}
+            style={styles.productImage}
+            resizeMode="cover"
+          />
         ) : (
           <View style={styles.productImagePlaceholder}>
             <Package size={20} color={theme.colors.textSecondary} />
@@ -220,8 +221,18 @@ export default function OrderDetailScreen() {
           {order ? (
             <>
               {/* Status Banner */}
-              <View style={[styles.statusBanner, { backgroundColor: statusColors[order.status].bg }]}>
-                <Text style={[styles.statusBannerText, { color: statusColors[order.status].text }]}>
+              <View
+                style={[
+                  styles.statusBanner,
+                  { backgroundColor: statusColors[order.status].bg },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.statusBannerText,
+                    { color: statusColors[order.status].text },
+                  ]}
+                >
                   Pesanan {statusLabel[order.status]}
                 </Text>
               </View>
@@ -234,7 +245,11 @@ export default function OrderDetailScreen() {
                 <View style={styles.card}>
                   <Text style={styles.sectionTitle}>Alamat Pengiriman</Text>
                   <View style={styles.addressRow}>
-                    <MapPin size={16} color={theme.colors.textSecondary} style={styles.addressIcon} />
+                    <MapPin
+                      size={16}
+                      color={theme.colors.textSecondary}
+                      style={styles.addressIcon}
+                    />
                     <Text style={styles.addressText}>{order.shipping_address}</Text>
                   </View>
                 </View>
@@ -247,7 +262,7 @@ export default function OrderDetailScreen() {
                 </View>
                 {order.items?.length ? (
                   order.items.map((item, index) =>
-                    renderItem(item, index === order.items.length - 1)
+                    renderItem(item, index === order.items.length - 1),
                   )
                 ) : (
                   <Text style={styles.emptyText}>Tidak ada produk</Text>
@@ -261,7 +276,9 @@ export default function OrderDetailScreen() {
                 >
                   <Text style={styles.totalLabel}>Total Pesanan:</Text>
                   <View style={styles.totalValueRow}>
-                    <Text style={styles.totalValue}>{formatCurrency(order.total_price)}</Text>
+                    <Text style={styles.totalValue}>
+                      {formatCurrency(order.total_price)}
+                    </Text>
                     {showPaymentDetails ? (
                       <ChevronUp size={18} color={theme.colors.textSecondary} />
                     ) : (
@@ -275,7 +292,9 @@ export default function OrderDetailScreen() {
                   <View style={styles.paymentDetails}>
                     <View style={styles.paymentRow}>
                       <Text style={styles.paymentLabel}>Subtotal Produk</Text>
-                      <Text style={styles.paymentValue}>{formatCurrency(subtotalProduk)}</Text>
+                      <Text style={styles.paymentValue}>
+                        {formatCurrency(subtotalProduk)}
+                      </Text>
                     </View>
                     <View style={styles.paymentRow}>
                       <Text style={styles.paymentLabel}>Ongkos Kirim</Text>
@@ -284,7 +303,9 @@ export default function OrderDetailScreen() {
                     <View style={styles.paymentDivider} />
                     <View style={styles.paymentRow}>
                       <Text style={styles.paymentTotalLabel}>Total Pembayaran</Text>
-                      <Text style={styles.paymentTotalValue}>{formatCurrency(order.total_price)}</Text>
+                      <Text style={styles.paymentTotalValue}>
+                        {formatCurrency(order.total_price)}
+                      </Text>
                     </View>
                   </View>
                 ) : null}
@@ -293,25 +314,30 @@ export default function OrderDetailScreen() {
               {/* Butuh Bantuan Section */}
               <View style={styles.card}>
                 <Text style={styles.sectionTitle}>Butuh Bantuan?</Text>
-                
+
                 <TouchableOpacity
                   style={styles.helpItem}
                   onPress={() => handleComingSoon('Ajukan Pengembalian')}
                 >
                   <RotateCcw size={20} color={theme.colors.textSecondary} />
                   <Text style={styles.helpItemText}>Ajukan Pengembalian</Text>
-                  <ChevronDown size={18} color={theme.colors.textSecondary} style={styles.helpChevron} />
+                  <ChevronDown
+                    size={18}
+                    color={theme.colors.textSecondary}
+                    style={styles.helpChevron}
+                  />
                 </TouchableOpacity>
 
                 <View style={styles.helpDivider} />
 
-                <TouchableOpacity
-                  style={styles.helpItem}
-                  onPress={handleContactAdmin}
-                >
+                <TouchableOpacity style={styles.helpItem} onPress={handleContactAdmin}>
                   <MessageCircle size={20} color={theme.colors.textSecondary} />
                   <Text style={styles.helpItemText}>Hubungi Admin</Text>
-                  <ChevronDown size={18} color={theme.colors.textSecondary} style={styles.helpChevron} />
+                  <ChevronDown
+                    size={18}
+                    color={theme.colors.textSecondary}
+                    style={styles.helpChevron}
+                  />
                 </TouchableOpacity>
 
                 <View style={styles.helpDivider} />
@@ -322,7 +348,11 @@ export default function OrderDetailScreen() {
                 >
                   <HelpCircle size={20} color={theme.colors.textSecondary} />
                   <Text style={styles.helpItemText}>Pusat Bantuan</Text>
-                  <ChevronDown size={18} color={theme.colors.textSecondary} style={styles.helpChevron} />
+                  <ChevronDown
+                    size={18}
+                    color={theme.colors.textSecondary}
+                    style={styles.helpChevron}
+                  />
                 </TouchableOpacity>
               </View>
 
@@ -361,16 +391,22 @@ export default function OrderDetailScreen() {
                   <View style={styles.orderDetailsExpanded}>
                     <View style={styles.orderDetailRow}>
                       <Text style={styles.orderDetailLabel}>ID Lengkap</Text>
-                      <Text style={styles.orderDetailValue} selectable>{orderId}</Text>
+                      <Text style={styles.orderDetailValue} selectable>
+                        {orderId}
+                      </Text>
                     </View>
                     <View style={styles.orderDetailRow}>
                       <Text style={styles.orderDetailLabel}>Waktu Pemesanan</Text>
-                      <Text style={styles.orderDetailValue}>{formatShortDate(order.order_date)}</Text>
+                      <Text style={styles.orderDetailValue}>
+                        {formatShortDate(order.order_date)}
+                      </Text>
                     </View>
                     {order.updated_at ? (
                       <View style={styles.orderDetailRow}>
                         <Text style={styles.orderDetailLabel}>Terakhir Diperbarui</Text>
-                        <Text style={styles.orderDetailValue}>{formatShortDate(order.updated_at)}</Text>
+                        <Text style={styles.orderDetailValue}>
+                          {formatShortDate(order.updated_at)}
+                        </Text>
                       </View>
                     ) : null}
                   </View>

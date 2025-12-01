@@ -1,9 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import {
-  User,
   Package,
   Heart,
   Settings,
@@ -12,6 +8,16 @@ import {
   ChevronRight,
   Shield,
 } from 'lucide-react-native';
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/hooks/useAuth';
 import { theme } from '@/theme';
@@ -40,7 +46,14 @@ interface MenuItemProps {
   isDestructive?: boolean;
 }
 
-function MenuItem({ icon, label, onPress, showBadge, badgeText, isDestructive }: MenuItemProps) {
+function MenuItem({
+  icon,
+  label,
+  onPress,
+  showBadge,
+  badgeText,
+  isDestructive,
+}: MenuItemProps) {
   return (
     <TouchableOpacity style={styles.menuItem} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.menuItemLeft}>
@@ -66,20 +79,16 @@ export default function ProfileScreen() {
   const { user, logout } = useAuth();
 
   const handleLogout = () => {
-    Alert.alert(
-      'Konfirmasi Logout',
-      'Apakah Anda yakin ingin keluar dari akun?',
-      [
-        { text: 'Batal', style: 'cancel' },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: async () => {
-            await logout();
-          },
+    Alert.alert('Konfirmasi Logout', 'Apakah Anda yakin ingin keluar dari akun?', [
+      { text: 'Batal', style: 'cancel' },
+      {
+        text: 'Logout',
+        style: 'destructive',
+        onPress: async () => {
+          await logout();
         },
-      ],
-    );
+      },
+    ]);
   };
 
   const handleComingSoon = (feature: string) => {

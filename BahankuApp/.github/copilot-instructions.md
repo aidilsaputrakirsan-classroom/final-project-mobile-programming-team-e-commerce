@@ -45,21 +45,25 @@ src/
 ## Pattern yang Harus Diikuti
 
 ### Custom Hook
+
 Hook harus return state, loading, error, dan functions. Contoh:
+
 ```typescript
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   const login = async (email: string, password: string) => { ... };
   const logout = async () => { ... };
-  
+
   return { user, loading, login, logout };
 };
 ```
 
 ### Component
+
 Component harus TypeScript dengan proper Props interface. Contoh:
+
 ```typescript
 interface ProductCardProps {
   product: Product;
@@ -77,7 +81,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) =>
 ```
 
 ### Store (Zustand)
+
 Store harus pakai persist middleware untuk AsyncStorage. Contoh:
+
 ```typescript
 export const useCartStore = create<CartState>()(
   persist(
@@ -140,6 +146,7 @@ SELALU pastikan user berada di folder `BahankuApp` sebelum menjalankan command i
 JANGAN langsung jalankan command instalasi tanpa navigasi ke folder yang benar.
 
 **Format Command PowerShell:**
+
 ```powershell
 # BENAR - Untuk PowerShell
 cd BahankuApp

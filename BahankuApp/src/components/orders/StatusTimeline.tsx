@@ -1,6 +1,6 @@
+import { Check, Package, Truck, CheckCircle2, XCircle } from 'lucide-react-native';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Check, Package, Truck, CheckCircle2, XCircle } from 'lucide-react-native';
 
 import { theme } from '@/theme';
 import { OrderStatus } from '@/types/order';
@@ -68,7 +68,10 @@ export function StatusTimeline({ currentStatus }: StatusTimelineProps) {
                 <Text
                   style={[
                     styles.stepLabel,
-                    isActive && { color: theme.colors.text, fontWeight: theme.fontWeight.semibold },
+                    isActive && {
+                      color: theme.colors.text,
+                      fontWeight: theme.fontWeight.semibold,
+                    },
                   ]}
                 >
                   {step.label}

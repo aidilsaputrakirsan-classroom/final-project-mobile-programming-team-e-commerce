@@ -1,12 +1,14 @@
 # 20251201 — Full Codebase Analysis
 
 ## OVERALL STATUS
+
 - Phase 1–4 foundation is stable: Expo/TypeScript setup, Supabase client, theming and product flows are implemented as documented in `package.json`, `tsconfig.json`, `src/theme/index.ts` and `src/hooks/useProducts.ts`. The UI follows the folder structure defined in AGENTS.md.
 - Phase 5–6 (cart + orders) are feature-complete in code (`src/store/cart.store.ts`, `app/(tabs)/cart.tsx`, `src/hooks/useOrders.ts`, `app/(tabs)/orders.tsx`, `app/order/[id].tsx`, `app/admin/orders.tsx`), but require QA, admin guarding, and lint fixes before marking as fully done. Documentation now tracks these as complete with caveats (`docs/Development_Checklist_BahanKu.md:51-103`).
 - Phase 7–10 remain largely untouched: there are no admin product screens, recipes/favorites hooks, UI store for dark mode, edit profile flows, or automated testing. Sprint backlog items after Sprint 2 are still pending in `docs/Task_Assignment_BahanKu.md:127-305`.
 - Tooling health is weak: `npm run lint` produces 5k+ Prettier errors across most files because CRLF endings are committed (e.g., `app/(auth)/login.tsx:1`), there are zero `__tests__`/`.test.tsx` files, and Expo-specific commands have not been verified recently.
 
 ## PHASE BREAKDOWN
+
 - ✅ **Phase 1 — Setup:** Expo app bootstrap, scripts, and aliases are in place (`package.json`, `tsconfig.json`). Environment vars use `EXPO_PUBLIC_*` names in `src/services/supabase.client.ts:6-23`, so `.env` instructions must reflect that.
 - ✅ **Phase 2 — Konfigurasi:** Theme, currency utils, and Supabase client are implemented (`src/theme/index.ts`, `src/libs/currency.ts`, `src/services/supabase.client.ts`). No dark-mode toggle yet, but base design tokens are ready.
 - ⚠️ **Phase 3 — Autentikasi:** `useAuth` handles login/register/logout and stores Supabase user (`src/hooks/useAuth.ts:10-279`). Google Sign-In is still a stub that only shows an alert (`src/hooks/useAuth.ts:230-245`), so acceptance criteria 1.3 is unmet. Router guard works in `app/_layout.tsx:8-36`.
@@ -19,18 +21,20 @@
 - ❌ **Phase 10 — Testing & Polishing:** No automated tests, linting fails hard, and README still covers only earlier phases (`README.md:1-60`). QA/backlog tasks in `docs/Task_Assignment_BahanKu.md:227-269` are untouched.
 
 ## IMPLEMENTED COMPONENTS INVENTORY
-| Area | Files | Notes |
-| --- | --- | --- |
-| Base UI | `src/components/EmptyState.tsx`, `src/components/ProductCard.tsx`, `src/components/QuantityStepper.tsx`, `src/components/SkeletonLoader.tsx` | Cover EmptyState, cards, loader animation per guidelines. |
-| Home sections | `src/components/home/*.tsx` | Brand header, search bar, category filter, promo banner, quick actions, product grid, recommendations. QuickActions still use non-Indonesian labels (`src/components/home/QuickActions.tsx:13-17`). |
-| Cart UI | `src/components/cart/CartItemRow.tsx`, `app/(tabs)/cart.tsx` | Row component handles selection, subtotal, and quantity. Cart screen includes select-all, modal checkout, and addresses. |
-| Orders UI | `src/components/orders/OrderCard.tsx`, `src/components/orders/StatusTimeline.tsx`, `app/(tabs)/orders.tsx`, `app/order/[id].tsx`, `app/admin/orders.tsx` | Covers order list cards, timeline visualization, detail actions, and admin modal. |
-| Hooks | `src/hooks/useAuth.ts`, `src/hooks/useProducts.ts`, `src/hooks/useOrders.ts` | Each returns state/loading/error plus CRUD helpers, matching AGENTS pattern. No `useRecipes` yet. |
-| Stores | `src/store/auth.store.ts`, `src/store/cart.store.ts` | Persisted Zustand stores for auth + cart. Missing `ui.store.ts` for dark mode. |
-| Services | `src/services/supabase.client.ts`, `src/services/image.ts` | Supabase client wires AsyncStorage, image service provides upload/delete/getPublicUrl/setup hooks but no compression. |
-| Libs | `src/libs/currency.ts`, `src/libs/orderId.ts` | Rupiah formatter and order ID formatting utilities used throughout orders views. |
+
+| Area          | Files                                                                                                                                                    | Notes                                                                                                                                                                                               |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Base UI       | `src/components/EmptyState.tsx`, `src/components/ProductCard.tsx`, `src/components/QuantityStepper.tsx`, `src/components/SkeletonLoader.tsx`             | Cover EmptyState, cards, loader animation per guidelines.                                                                                                                                           |
+| Home sections | `src/components/home/*.tsx`                                                                                                                              | Brand header, search bar, category filter, promo banner, quick actions, product grid, recommendations. QuickActions still use non-Indonesian labels (`src/components/home/QuickActions.tsx:13-17`). |
+| Cart UI       | `src/components/cart/CartItemRow.tsx`, `app/(tabs)/cart.tsx`                                                                                             | Row component handles selection, subtotal, and quantity. Cart screen includes select-all, modal checkout, and addresses.                                                                            |
+| Orders UI     | `src/components/orders/OrderCard.tsx`, `src/components/orders/StatusTimeline.tsx`, `app/(tabs)/orders.tsx`, `app/order/[id].tsx`, `app/admin/orders.tsx` | Covers order list cards, timeline visualization, detail actions, and admin modal.                                                                                                                   |
+| Hooks         | `src/hooks/useAuth.ts`, `src/hooks/useProducts.ts`, `src/hooks/useOrders.ts`                                                                             | Each returns state/loading/error plus CRUD helpers, matching AGENTS pattern. No `useRecipes` yet.                                                                                                   |
+| Stores        | `src/store/auth.store.ts`, `src/store/cart.store.ts`                                                                                                     | Persisted Zustand stores for auth + cart. Missing `ui.store.ts` for dark mode.                                                                                                                      |
+| Services      | `src/services/supabase.client.ts`, `src/services/image.ts`                                                                                               | Supabase client wires AsyncStorage, image service provides upload/delete/getPublicUrl/setup hooks but no compression.                                                                               |
+| Libs          | `src/libs/currency.ts`, `src/libs/orderId.ts`                                                                                                            | Rupiah formatter and order ID formatting utilities used throughout orders views.                                                                                                                    |
 
 ## MISSING COMPONENTS (needed for Sprint 3)
+
 1. **Admin Product List (`app/admin/products.tsx`)** — P0 (~2.5 days). Needs CRUD table, search/filter, delete confirmations, and integration with `useProducts`.
 2. **Admin Product Form (`app/admin/product-form.tsx`)** — P0 (~3 days). Requires react-hook-form + Zod, Async image picker, upload via `uploadProductImage`, edit-mode prefills, and optimistic navigation.
 3. **Image handling enhancements** — P0 (~1 day). Add compression/resizing before upload, `expo-image-picker` dependency, and `setupProductsBucket` bootstrap.
@@ -40,15 +44,17 @@
 7. **Testing & lint fixes** — P1 (~1-1.5 days). Normalize LF endings, run Prettier, add basic smoke tests (or at least scripts) before Sprint 3.
 
 ## SPRINT 3 READINESS
-| Check | Status | Details |
-| --- | --- | --- |
-| Image upload service | ⚠️ Partial | `src/services/image.ts:10-105` can upload/delete files but lacks compression, does not call `setupProductsBucket`, and there is no image picker dependency. |
-| `useProducts` CRUD coverage | ✅ | `src/hooks/useProducts.ts:113-206` already exposes `createProduct`, `updateProduct`, `deleteProduct`; just consume them from admin screens. |
-| Role-aware auth | ⚠️ | `useAuth` stores `user.role` (`src/hooks/useAuth.ts:84-98`), but router/layout never enforces admin-only routes; `_layout` under `/admin` is public (`app/admin/_layout.tsx:1-11`). |
-| Supabase Storage configuration | ⚠️ | Bucket helper exists but is never invoked, and no configuration ensures the `products` bucket exists or is public. Need infra checklist before form release. |
-| Admin layout guard | ❌ | There is no guard component or middleware; any authenticated user can push `/admin/orders` and only sees a text warning (`app/admin/orders.tsx:190-198`). Guard should redirect non-admins. |
+
+| Check                          | Status     | Details                                                                                                                                                                                     |
+| ------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Image upload service           | ⚠️ Partial | `src/services/image.ts:10-105` can upload/delete files but lacks compression, does not call `setupProductsBucket`, and there is no image picker dependency.                                 |
+| `useProducts` CRUD coverage    | ✅         | `src/hooks/useProducts.ts:113-206` already exposes `createProduct`, `updateProduct`, `deleteProduct`; just consume them from admin screens.                                                 |
+| Role-aware auth                | ⚠️         | `useAuth` stores `user.role` (`src/hooks/useAuth.ts:84-98`), but router/layout never enforces admin-only routes; `_layout` under `/admin` is public (`app/admin/_layout.tsx:1-11`).         |
+| Supabase Storage configuration | ⚠️         | Bucket helper exists but is never invoked, and no configuration ensures the `products` bucket exists or is public. Need infra checklist before form release.                                |
+| Admin layout guard             | ❌         | There is no guard component or middleware; any authenticated user can push `/admin/orders` and only sees a text warning (`app/admin/orders.tsx:190-198`). Guard should redirect non-admins. |
 
 ## CRITICAL ISSUES (Must Fix)
+
 - 🔴 **CI linting completely fails** — `npm run lint` reports >5k Prettier errors (CRLF) across files such as `app/(auth)/login.tsx:1`, `App.tsx:1`, and `src/theme/index.ts:1`. No branch can pass DoD until line endings are normalized and lint warnings resolved.
 - 🔴 **Admin routes are unsecured** — `_layout` under `/admin` simply renders a Stack (`app/admin/_layout.tsx:1-11`) and relies on in-component checks (`app/admin/orders.tsx:190-198`). Non-admins can still access APIs in `useOrders` if they craft requests. Add router guards (e.g., layout wrapper that redirects) and server-side RLS rules.
 - 🟡 **Home listing breaks performance requirements** — `ProductGridSection` slices to 6 items and renders via `ScrollView` (`src/components/home/ProductGridSection.tsx:39-52`, `app/(tabs)/index.tsx:67-107`). Requirement 2/15 demands a `FlatList` with virtualization plus 300 ms debounce, which is missing.
@@ -58,10 +64,12 @@
 - 🟢 **Legacy test screen still committed** — `app/test-todo.tsx:1-180` uses English text, direct `supabase` import via relative path, and inconsistent styling. It should be isolated under `/drafts` or removed to avoid confusing Expo Router.
 
 ## UPDATED DOCUMENTATION
+
 - `docs/Development_Checklist_BahanKu.md:51-103` now marks Phase 5–6 as [Telah Dibuat] with notes about pending guard/QA and acknowledges the existing image upload helper in Phase 7 while keeping admin UI tasks open.
 - `docs/Task_Assignment_BahanKu.md:45-305` reflects Sprint 1 completion, Sprint 2 partial status, and revised milestone table (M1 ✅, M2 ⚠️). Each sprint now carries a status line so future agents can see progress before picking up tasks.
 
 ## CODE QUALITY FINDINGS
+
 - **Lint/typecheck:** `npm run lint` fails due to line-ending issues (see `app/(auth)/login.tsx:1`, `src/types/product.ts:1`). `npx tsc --noEmit` currently passes, which indicates type coverage is healthy once formatting is fixed.
 - **No automated tests:** There are zero `__tests__` or `*.test.tsx` files; Sprint 6 DoD items for lint/typecheck/tests are untouched (`docs/Task_Assignment_BahanKu.md:222-269`). Add at least smoke/unit tests for stores and hooks.
 - **Search UX gaps:** Home search fires only on submit and lacks 300 ms debounce (`app/(tabs)/index.tsx:53-86`), so every keystroke doesn’t filter locally as required.
@@ -73,6 +81,7 @@
 - **Legacy todo demo:** `app/test-todo.tsx` is outside the agreed structure, imports Supabase via relative path, and mixes English labels. Move it under a playground folder or delete it.
 
 ## NEXT STEPS
+
 1. Normalize line endings (`git config core.autocrlf false`, re-run Prettier) and add lint/typecheck to CI so DoD is achievable.
 2. Stand up admin guards + UI for Sprint 3, integrating `useProducts` + `uploadProductImage` with image-picker/validation.
 3. Replace home listing with a `FlatList` + debounce and seed pagination logic for >100 items.

@@ -1,7 +1,6 @@
+import { Minus, Plus } from 'lucide-react-native';
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-
-import { Minus, Plus } from 'lucide-react-native';
 
 import { theme } from '@/theme';
 

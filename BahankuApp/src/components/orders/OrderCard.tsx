@@ -1,6 +1,6 @@
+import { Package, MapPin } from 'lucide-react-native';
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import { Package, MapPin } from 'lucide-react-native';
 
 import { formatCurrency } from '@/libs/currency';
 import { formatOrderId } from '@/libs/orderId';

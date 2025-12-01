@@ -1,4 +1,5 @@
 import { useFocusEffect, useRouter } from 'expo-router';
+import { ArrowLeft, Search, X } from 'lucide-react-native';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   FlatList,
@@ -12,7 +13,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Search, X } from 'lucide-react-native';
 
 import { EmptyState } from '@/components/EmptyState';
 import { OrderCardSkeleton } from '@/components/SkeletonLoader';
@@ -36,7 +36,7 @@ export default function AdminOrdersScreen() {
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | 'semua'>('semua');
-  const [sortBy, setSortBy] = useState<'terbaru' | 'terlama' | 'tertinggi'>('terbaru');
+  const [_sortBy] = useState<'terbaru' | 'terlama' | 'tertinggi'>('terbaru');
 
   const isAdmin = user?.role === 'admin';
 
@@ -70,9 +70,9 @@ export default function AdminOrdersScreen() {
 
     // Sort
     result.sort((a, b) => {
-      if (sortBy === 'terbaru') {
+      if (_sortBy === 'terbaru') {
         return new Date(b.order_date).getTime() - new Date(a.order_date).getTime();
-      } else if (sortBy === 'terlama') {
+      } else if (_sortBy === 'terlama') {
         return new Date(a.order_date).getTime() - new Date(b.order_date).getTime();
       } else {
         // tertinggi
@@ -81,7 +81,7 @@ export default function AdminOrdersScreen() {
     });
 
     return result;
-  }, [orders, selectedStatus, searchQuery, sortBy]);
+  }, [orders, selectedStatus, searchQuery, _sortBy]);
 
   const loadOrders = useCallback(async () => {
     if (!isAdmin) return;
@@ -132,8 +132,12 @@ export default function AdminOrdersScreen() {
     <View style={styles.orderCard}>
       <View style={styles.orderHeader}>
         <View>
-          <Text style={styles.orderTitle}>{item.customer_name || item.customer_email}</Text>
-          <Text style={styles.orderSubtitle}>{new Date(item.order_date).toLocaleString('id-ID')}</Text>
+          <Text style={styles.orderTitle}>
+            {item.customer_name || item.customer_email}
+          </Text>
+          <Text style={styles.orderSubtitle}>
+            {new Date(item.order_date).toLocaleString('id-ID')}
+          </Text>
         </View>
         <Text style={styles.statusLabel}>{item.status}</Text>
       </View>
@@ -154,7 +158,10 @@ export default function AdminOrdersScreen() {
         >
           <Text style={styles.linkButtonText}>Detail</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.primaryButton} onPress={() => openStatusModal(item)}>
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={() => openStatusModal(item)}
+        >
           <Text style={styles.primaryButtonText}>Ubah Status</Text>
         </TouchableOpacity>
       </View>
@@ -177,7 +184,9 @@ export default function AdminOrdersScreen() {
               onPress={() => setSelectedStatus(filter.value)}
               activeOpacity={0.7}
             >
-              <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
+              <Text
+                style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
+              >
                 {filter.label}
               </Text>
             </TouchableOpacity>
@@ -211,7 +220,9 @@ export default function AdminOrdersScreen() {
           </TouchableOpacity>
           <View style={styles.headerTextContainer}>
             <Text style={styles.headerTitle}>Kelola Pesanan</Text>
-            <Text style={styles.headerSubtitle}>Update status dan lihat detail pesanan</Text>
+            <Text style={styles.headerSubtitle}>
+              Update status dan lihat detail pesanan
+            </Text>
           </View>
         </View>
 
@@ -227,7 +238,10 @@ export default function AdminOrdersScreen() {
               onChangeText={setSearchQuery}
             />
             {searchQuery ? (
-              <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
+              <TouchableOpacity
+                onPress={() => setSearchQuery('')}
+                style={styles.clearButton}
+              >
                 <X size={18} color={theme.colors.textSecondary} />
               </TouchableOpacity>
             ) : null}
@@ -251,11 +265,17 @@ export default function AdminOrdersScreen() {
             keyExtractor={(item) => item.order_id}
             renderItem={renderOrder}
             contentContainerStyle={
-              filteredAndSortedOrders.length === 0 ? styles.emptyContent : styles.listContent
+              filteredAndSortedOrders.length === 0
+                ? styles.emptyContent
+                : styles.listContent
             }
             ListEmptyComponent={
               <EmptyState
-                title={searchQuery || selectedStatus !== 'semua' ? 'Tidak ditemukan' : 'Belum ada pesanan'}
+                title={
+                  searchQuery || selectedStatus !== 'semua'
+                    ? 'Tidak ditemukan'
+                    : 'Belum ada pesanan'
+                }
                 message={
                   searchQuery || selectedStatus !== 'semua'
                     ? 'Coba ubah filter atau kata kunci pencarian'

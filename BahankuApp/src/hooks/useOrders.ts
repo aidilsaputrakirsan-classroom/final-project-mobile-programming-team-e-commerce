@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { supabase } from '@/services/supabase.client';
+
 import { useAuth } from '@/hooks/useAuth';
 import {
   CreateOrderParams,
@@ -17,7 +18,9 @@ interface UseOrdersReturn {
   fetchOrders: (userId?: string) => Promise<void>;
   fetchAllOrders: () => Promise<void>;
   createOrder: (params: CreateOrderParams) => Promise<CreateOrderResult>;
-  validateStock: (items: CreateOrderParams['cartItems']) => Promise<ValidateStockResult[]>;
+  validateStock: (
+    items: CreateOrderParams['cartItems'],
+  ) => Promise<ValidateStockResult[]>;
   getOrderById: (orderId: string) => Promise<OrderSummary | null>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
 }
@@ -74,20 +77,17 @@ export const useOrders = (): UseOrdersReturn => {
     [user?.id],
   );
 
-  const validateStock = useCallback(
-    async (items: CreateOrderParams['cartItems']) => {
-      const { data, error: validateError } = await supabase.rpc('fn_validate_stock', {
-        cart_items: items,
-      });
+  const validateStock = useCallback(async (items: CreateOrderParams['cartItems']) => {
+    const { data, error: validateError } = await supabase.rpc('fn_validate_stock', {
+      cart_items: items,
+    });
 
-      if (validateError) {
-        throw validateError;
-      }
+    if (validateError) {
+      throw validateError;
+    }
 
-      return (data || []) as ValidateStockResult[];
-    },
-    [],
-  );
+    return (data || []) as ValidateStockResult[];
+  }, []);
 
   const fetchAllOrders = useCallback(async () => {
     setLoading(true);
@@ -145,7 +145,9 @@ export const useOrders = (): UseOrdersReturn => {
           throw rpcError;
         }
 
-        const payload = (Array.isArray(data) ? data[0] : data) as CreateOrderResult | undefined;
+        const payload = (Array.isArray(data) ? data[0] : data) as
+          | CreateOrderResult
+          | undefined;
 
         if (!payload || !payload.success) {
           throw new Error(payload?.message || 'Checkout gagal diproses');
@@ -154,8 +156,7 @@ export const useOrders = (): UseOrdersReturn => {
         await fetchOrders(userId);
         return payload;
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Checkout gagal diproses';
+        const message = err instanceof Error ? err.message : 'Checkout gagal diproses';
         setError(message);
         console.error('Error create order:', err);
         throw err;
