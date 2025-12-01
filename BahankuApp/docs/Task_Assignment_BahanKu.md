@@ -47,23 +47,25 @@ Berdasarkan Development Checklist yang telah diupdate:
 2. **Konfigurasi Dasar** (Phase 2) — Pangeran & Adam
 3. **Autentikasi** (Phase 3) — Pangeran & Adam
 4. **Produk (List & Detail)** (Phase 4) — Pangeran & Adam
+5. **Keranjang & Checkout Dasar** (Phase 5) — Cart store + UI checkout selesai
+6. **Pesanan Customer/Admin** (Phase 6) — useOrders hook, halaman orders & admin orders
 
 ### 🔄 Sedang Dikerjakan:
-- Test build di Expo Go untuk iOS (Pangeran)
+- QA lint/typecheck + validasi end-to-end checkout → orders (Shared)
+- Test build di Expo Go untuk iOS & Android (Pangeran)
 
 ### ⏳ Belum Dikerjakan:
-- Phase 5: Keranjang (Cart)
-- Phase 6: Pesanan (Orders)
-- Phase 7: Admin Produk
+- Phase 7: Admin Produk (UI + form + image picker)
 - Phase 8: Resep & Favorit
-- Phase 9: Profil & Pengaturan
-- Phase 10: Testing dan Polishing
+- Phase 9: Profil & Pengaturan lanjutan (dark mode, edit profil)
+- Phase 10: Testing dan Polishing akhir
 
 ---
 
 ## Sprint Plan
 
 ### Sprint 1 (Estimasi: 3-4 hari) — Keranjang & Checkout
+**Status:** ✅ Selesai — Cart store, UI, dan flow checkout → Supabase sudah terhubung; tinggal regression test lint/typecheck.
 **Target:** User dapat menambahkan produk ke keranjang dan melakukan checkout
 
 | Task | PIC | Estimasi | Dependencies | Branch |
@@ -88,6 +90,7 @@ Berdasarkan Development Checklist yang telah diupdate:
 ---
 
 ### Sprint 2 (Estimasi: 4-5 hari) — Pesanan & Order Management
+**Status:** ⚠️ Partial — Halaman orders & admin orders + RPC create_order aktif, tapi belum ada guard admin & belum dites penuh lint/typecheck.
 **Target:** User dapat checkout dan melihat riwayat pesanan, Admin dapat update status pesanan
 
 | Task | PIC | Estimasi | Dependencies | Branch |
@@ -291,8 +294,8 @@ Berdasarkan Development Checklist yang telah diupdate:
 
 | Milestone | Target Date | Status | Deliverables |
 |-----------|-------------|--------|--------------|
-| **M1: Cart & Checkout** | [Tanggal target Sprint 1] | ⏳ Pending | User dapat add to cart dan checkout |
-| **M2: Orders Management** | [Tanggal target Sprint 2] | ⏳ Pending | User dapat view orders, Admin dapat update status |
+| **M1: Cart & Checkout** | [Tanggal target Sprint 1] | ✅ Selesai (butuh QA akhir) | User dapat add to cart dan checkout |
+| **M2: Orders Management** | [Tanggal target Sprint 2] | ⚠️ Partial | User dapat view orders, Admin dapat update status |
 | **M3: Admin CRUD Produk** | [Tanggal target Sprint 3] | ⏳ Pending | Admin dapat manage produk dengan upload gambar |
 | **M4: Resep & Favorit** | [Tanggal target Sprint 4] | ⏳ Pending | User dapat view resep dan save favorites |
 | **M5: Profil & Settings** | [Tanggal target Sprint 5] | ⏳ Pending | User dapat edit profil dan toggle dark mode |

@@ -50,20 +50,20 @@ Penanggung jawab: (Pangeran) | (Adam)
 
 ## 5. Keranjang (Cart)
 
-- [Belum Dibuat] Buat Zustand store cart.store.ts (Pangeran)
-- [Belum Dibuat] Tambah fungsi addItem, updateQty, removeItem, clear, total (Pangeran)
-- [Belum Dibuat] Persist cart ke AsyncStorage (Pangeran)
-- [Belum Dibuat] Halaman cart.tsx (list item dan total harga) (Adam)
-- [Belum Dibuat] Tombol Checkout (Adam)
+- [Telah Dibuat] Buat Zustand store cart.store.ts (Pangeran)
+- [Telah Dibuat] Tambah fungsi addItem, updateQty, removeItem, clear, total (Pangeran)
+- [Telah Dibuat] Persist cart ke AsyncStorage (Pangeran)
+- [Telah Dibuat] Halaman cart.tsx (list item dan total harga) (Adam)
+- [Telah Dibuat] Tombol Checkout + modal alamat (Adam)
 
 ---
 
 ## 6. Pesanan
 
-- [Sedang Dikerjakan] Hook useOrders (createOrder, listMyOrders, updateStatus) (Pangeran) — fungsi create/list/detail/status sudah tersedia, menunggu pengujian lanjutan
-- [Sedang Dikerjakan] Insert order & order_items ke Supabase (Pangeran) — integrasi RPC `fn_create_order` + view `v_order_details`
-- [Sedang Dikerjakan] Halaman orders.tsx (riwayat pesanan user) (Pangeran) — versi dasar selesai + navigasi ke detail pesanan
-- [Sedang Dikerjakan] Halaman admin/orders.tsx (ubah status pesanan) (Pangeran) — versi sederhana untuk update status & buka detail
+- [Telah Dibuat] Hook useOrders (createOrder, listMyOrders, updateStatus) (Pangeran) — fungsi create/list/detail/status sudah tersedia, lint & QA belum dijalankan
+- [Telah Dibuat] Insert order & order_items ke Supabase (Pangeran) — integrasi RPC `fn_create_order` + view `v_order_details`
+- [Telah Dibuat] Halaman orders.tsx (riwayat pesanan user) (Pangeran) — list + detail sudah terhubung
+- [Telah Dibuat] Halaman admin/orders.tsx (ubah status pesanan) (Pangeran) — perlu guard admin + validasi lanjutan
 
 ---
 
@@ -71,7 +71,7 @@ Penanggung jawab: (Pangeran) | (Adam)
 
 - [Belum Dibuat] Halaman admin/products.tsx (list + hapus produk) (Adam)
 - [Belum Dibuat] Halaman admin/product-form.tsx (tambah & edit produk) (Adam)
-- [Belum Dibuat] Upload gambar ke Storage via image.ts (Adam)
+- [Telah Dibuat] Upload gambar ke Storage via image.ts (Adam) — service tersedia, belum terintegrasi dengan UI/Supabase Storage setup
 
 ---
 
@@ -87,7 +87,7 @@ Penanggung jawab: (Pangeran) | (Adam)
 
 ## 9. Pengaturan & Profil
 
-- [Belum Dibuat] Halaman profile.tsx (tampil nama, email, tombol logout) (Adam)
+- [Sedang Dikerjakan] Halaman profile.tsx (tampil nama, email, tombol logout) (Adam) — UI dasar & akses admin sudah ada, edit profil & favorit belum
 - [Belum Dibuat] Tambahkan toggle dark mode di ui.store.ts (Pangeran)
 
 ---
