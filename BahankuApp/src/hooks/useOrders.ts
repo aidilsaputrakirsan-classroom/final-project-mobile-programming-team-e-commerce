@@ -222,9 +222,9 @@ export const useOrders = (): UseOrdersReturn => {
           prev.map((order) =>
             order.order_id === orderId
               ? {
-                ...order,
-                status,
-              }
+                  ...order,
+                  status,
+                }
               : order,
           ),
         );

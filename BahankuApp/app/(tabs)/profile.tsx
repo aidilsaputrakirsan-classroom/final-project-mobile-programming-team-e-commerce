@@ -7,6 +7,7 @@ import {
   LogOut,
   ChevronRight,
   Shield,
+  ShoppingBag,
 } from 'lucide-react-native';
 import React from 'react';
 import {
@@ -153,6 +154,12 @@ export default function ProfileScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Admin</Text>
             <View style={styles.menuCard}>
+              <MenuItem
+                icon={<ShoppingBag size={20} color={theme.colors.primary} />}
+                label="Kelola Produk"
+                onPress={() => router.push('/admin/products')}
+              />
+              <View style={styles.menuDivider} />
               <MenuItem
                 icon={<Shield size={20} color={theme.colors.secondary} />}
                 label="Kelola Pesanan"
