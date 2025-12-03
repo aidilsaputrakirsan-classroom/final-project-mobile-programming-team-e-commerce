@@ -69,9 +69,11 @@ Penanggung jawab: (Pangeran) | (Adam)
 
 ## 7. Admin Produk
 
-- [Belum Dibuat] Halaman admin/products.tsx (list + hapus produk) (Adam)
-- [Belum Dibuat] Halaman admin/product-form.tsx (tambah & edit produk) (Adam)
-- [Telah Dibuat] Upload gambar ke Storage via image.ts (Adam) — service tersedia, belum terintegrasi dengan UI/Supabase Storage setup
+- [Telah Dibuat] Halaman admin/products.tsx (list + search + hapus produk + menu aksi) (Adam)
+- [Telah Dibuat] Halaman admin/product-form.tsx (tambah & edit produk dengan validasi Zod) (Adam)
+- [Telah Dibuat] Upload gambar ke Storage via image.ts (React Native compatible dengan expo-file-system/legacy) (Adam)
+- [Telah Dibuat] UI statistik modern (compact layout, subtle tint border, icon reinforcement) (Adam)
+- [Telah Dibuat] Input URL gambar alternative di form produk (Adam)
 
 ---
 
@@ -87,7 +89,7 @@ Penanggung jawab: (Pangeran) | (Adam)
 
 ## 9. Pengaturan & Profil
 
-- [Sedang Dikerjakan] Halaman profile.tsx (tampil nama, email, tombol logout) (Adam) — UI dasar & akses admin sudah ada, edit profil & favorit belum
+- [Telah Dibuat] Halaman profile.tsx (tampil nama, email, tombol logout, menu "Kelola Produk" untuk admin) (Adam)
 - [Belum Dibuat] Tambahkan toggle dark mode di ui.store.ts (Pangeran)
 
 ---

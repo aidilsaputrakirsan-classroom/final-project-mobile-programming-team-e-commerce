@@ -41,7 +41,7 @@
 
 ---
 
-## Status Saat Ini (Branch: feature/products-core)
+## Status Saat Ini (Branch: feature/admin-products)
 
 Berdasarkan Development Checklist yang telah diupdate:
 
@@ -51,20 +51,21 @@ Berdasarkan Development Checklist yang telah diupdate:
 2. **Konfigurasi Dasar** (Phase 2) — Pangeran & Adam
 3. **Autentikasi** (Phase 3) — Pangeran & Adam
 4. **Produk (List & Detail)** (Phase 4) — Pangeran & Adam
-5. **Keranjang & Checkout Dasar** (Phase 5) — Cart store + UI checkout selesai
-6. **Pesanan Customer/Admin** (Phase 6) — useOrders hook, halaman orders & admin orders
+5. **Keranjang & Checkout Dasar** (Phase 5) — Pangeran & Adam
+6. **Pesanan Customer/Admin** (Phase 6) — Pangeran
+7. **Admin CRUD Produk** (Phase 7) — Adam ✅ Sprint 3 Completed
+8. **Profil** (Partial Phase 9) — Adam (view & menu admin, edit profil belum)
 
 ### 🔄 Sedang Dikerjakan:
 
-- QA lint/typecheck + validasi end-to-end checkout → orders (Shared)
-- Test build di Expo Go untuk iOS & Android (Pangeran)
+- Regression test & QA lint/typecheck sebelum merge ke main
+- Persiapan Sprint 4 (Resep & Favorit)
 
 ### ⏳ Belum Dikerjakan:
 
-- Phase 7: Admin Produk (UI + form + image picker)
-- Phase 8: Resep & Favorit
-- Phase 9: Profil & Pengaturan lanjutan (dark mode, edit profil)
-- Phase 10: Testing dan Polishing akhir
+- Phase 8: Resep & Favorit (Sprint 4)
+- Phase 9: Profil & Dark Mode lanjutan (Sprint 5)
+- Phase 10: Testing dan Polishing akhir (Sprint 6)
 
 ---
 
@@ -136,6 +137,7 @@ Berdasarkan Development Checklist yang telah diupdate:
 
 ### Sprint 3 (Estimasi: 4-5 hari) — Admin CRUD Produk
 
+**Status:** ✅ Selesai — Halaman admin products & product-form dengan upload gambar, form validation, dan UI modern
 **Target:** Admin dapat mengelola produk (create, edit, delete) dengan upload gambar
 
 | Task                                                                                | PIC      | Estimasi | Dependencies                               | Branch                       |
@@ -145,24 +147,28 @@ Berdasarkan Development Checklist yang telah diupdate:
 | Implementasi compress/resize gambar sebelum upload (max 1MB)                        | **Adam** | 1.5 jam  | image.ts                                   | `feature/image-upload`       |
 | Test upload gambar ke Storage dan get public URL                                    | **Adam** | 1 jam    | image.ts                                   | `feature/image-upload`       |
 | **Frontend: Admin Products UI**                                                     |          |          |                                            |                              |
-| Buat halaman `app/admin/products.tsx` (list produk dengan tombol Edit dan Hapus)    | **Adam** | 2.5 jam  | useProducts                                | `feature/admin-products`     |
-| Implementasi delete product dengan konfirmasi dialog                                | **Adam** | 1.5 jam  | useProducts                                | `feature/admin-products`     |
+| ✅ Buat halaman `app/admin/products.tsx` (list produk dengan tombol Edit dan Hapus) | **Adam** | 2.5 jam  | useProducts                                | `feature/admin-products`     |
+| ✅ Implementasi delete product dengan konfirmasi dialog                             | **Adam** | 1.5 jam  | useProducts                                | `feature/admin-products`     |
 | **Frontend: Admin Product Form**                                                    |          |          |                                            |                              |
-| Buat halaman `app/admin/product-form.tsx` (form create/edit produk)                 | **Adam** | 3 jam    | useProducts, image.ts                      | `feature/admin-product-form` |
-| Setup form validation dengan Zod (name, description, price, stock, category, image) | **Adam** | 1.5 jam  | product-form.tsx                           | `feature/admin-product-form` |
-| Implementasi image picker (expo-image-picker)                                       | **Adam** | 1.5 jam  | product-form.tsx                           | `feature/admin-product-form` |
-| Integrasi upload gambar saat submit form                                            | **Adam** | 1.5 jam  | image.ts, product-form.tsx                 | `feature/admin-product-form` |
-| Implementasi edit mode (prefill form dengan data produk existing)                   | **Adam** | 1 jam    | product-form.tsx                           | `feature/admin-product-form` |
-| Test CRUD produk (create, edit, delete, upload gambar)                              | **Adam** | 2 jam    | admin/products.tsx, admin/product-form.tsx | `feature/admin-product-form` |
+| ✅ Buat halaman `app/admin/product-form.tsx` (form create/edit produk)              | **Adam** | 3 jam    | useProducts, image.ts                      | `feature/admin-product-form` |
+| ✅ Setup form validation dengan Zod (name, description, price, stock, category, image) | **Adam** | 1.5 jam  | product-form.tsx                           | `feature/admin-product-form` |
+| ✅ Implementasi image picker (expo-image-picker)                                    | **Adam** | 1.5 jam  | product-form.tsx                           | `feature/admin-product-form` |
+| ✅ Integrasi upload gambar saat submit form (React Native compatible)               | **Adam** | 1.5 jam  | image.ts, product-form.tsx                 | `feature/admin-product-form` |
+| ✅ Implementasi edit mode (prefill form dengan data produk existing)                | **Adam** | 1 jam    | product-form.tsx                           | `feature/admin-product-form` |
+| ✅ Tambah dukungan input URL gambar alternative                                    | **Adam** | 1 jam    | product-form.tsx                           | `feature/admin-product-form` |
+| ✅ Test CRUD produk (create, edit, delete, upload gambar)                          | **Adam** | 2 jam    | admin/products.tsx, admin/product-form.tsx | `feature/admin-product-form` |
+| ✅ Perbaiki UI modern dengan spacing lapang, card minimalis, statistik compact      | **Adam** | 2 jam    | admin/products.tsx                         | `feature/admin-products`     |
 
 **Definition of Done:**
 
-- [ ] Admin dapat melihat list produk di admin panel
-- [ ] Admin dapat menambah produk baru dengan upload gambar
-- [ ] Admin dapat edit produk existing (termasuk ganti gambar)
-- [ ] Admin dapat hapus produk dengan konfirmasi
-- [ ] Form validasi berfungsi dengan baik (Zod)
-- [ ] Gambar ter-compress dan ter-upload ke Supabase Storage
+- ✅ Admin dapat melihat list produk di admin panel
+- ✅ Admin dapat menambah produk baru dengan upload gambar
+- ✅ Admin dapat edit produk existing (termasuk ganti gambar)
+- ✅ Admin dapat hapus produk dengan konfirmasi
+- ✅ Form validasi berfungsi dengan baik (Zod)
+- ✅ Gambar ter-upload ke Supabase Storage (React Native compatible)
+- ✅ UI statistik modern dengan layout compact dan subtle tint
+- ✅ Modal menu aksi untuk edit/delete produk
 
 ---
 
