@@ -1,6 +1,7 @@
+import { useRouter } from 'expo-router';
 import { BookOpen, Zap, Star, Percent, LucideIcon } from 'lucide-react-native';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 
 import { theme } from '@/theme';
 
@@ -8,22 +9,37 @@ interface ActionItem {
   icon: LucideIcon;
   label: string;
   color: string;
+  route?: string;
 }
 
 const ACTIONS: ActionItem[] = [
-  { icon: BookOpen, label: 'Resep', color: '#F97316' },
+  { icon: BookOpen, label: 'Resep', color: '#F97316', route: '/recipes' },
   { icon: Zap, label: 'Flash', color: '#EAB308' },
   { icon: Star, label: 'Best', color: '#3B82F6' },
   { icon: Percent, label: 'Diskon', color: '#EF4444' },
 ];
 
 export const QuickActions = () => {
+  const router = useRouter();
+
+  const handlePress = (action: ActionItem) => {
+    if (action.route) {
+      router.push(action.route as never);
+    } else {
+      Alert.alert('Segera Hadir', `Fitur ${action.label} akan segera tersedia.`);
+    }
+  };
+
   return (
     <View style={styles.shortcutGrid}>
       {ACTIONS.map((action) => {
         const IconComponent = action.icon;
         return (
-          <TouchableOpacity key={action.label} style={styles.shortcutItem}>
+          <TouchableOpacity
+            key={action.label}
+            style={styles.shortcutItem}
+            onPress={() => handlePress(action)}
+          >
             <View style={[styles.shortcutIcon, { backgroundColor: `${action.color}15` }]}>
               <IconComponent size={24} color={action.color} />
             </View>

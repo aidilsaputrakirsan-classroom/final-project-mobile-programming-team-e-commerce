@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Shield,
   ShoppingBag,
+  ChefHat,
 } from 'lucide-react-native';
 import React from 'react';
 import {
@@ -142,9 +143,15 @@ export default function ProfileScreen() {
             />
             <View style={styles.menuDivider} />
             <MenuItem
+              icon={<ChefHat size={20} color={theme.colors.secondary} />}
+              label="Resep Masakan"
+              onPress={() => router.push('/recipes')}
+            />
+            <View style={styles.menuDivider} />
+            <MenuItem
               icon={<Heart size={20} color={theme.colors.error} />}
-              label="Favorit"
-              onPress={() => handleComingSoon('Favorit')}
+              label="Resep Favorit"
+              onPress={() => router.push('/favorites')}
             />
           </View>
         </View>

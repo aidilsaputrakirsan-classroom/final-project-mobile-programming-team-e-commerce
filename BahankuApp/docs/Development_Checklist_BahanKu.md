@@ -79,11 +79,15 @@ Penanggung jawab: (Pangeran) | (Adam)
 
 ## 8. Resep & Favorit
 
-- [Belum Dibuat] Hook useRecipes (list resep) (Pangeran)
-- [Belum Dibuat] Hook toggleFavoriteRecipe() (Pangeran)
-- [Belum Dibuat] Halaman recipes/index.tsx (Adam)
-- [Belum Dibuat] Halaman recipes/[id].tsx (Adam)
-- [Belum Dibuat] Halaman favorites/index.tsx (Pangeran)
+- [Telah Dibuat] Hook useRecipes (list resep, getById, search) (Pangeran)
+- [Telah Dibuat] Hook toggleFavorite, getMyFavorites, checkIsFavorite (Pangeran)
+- [Telah Dibuat] Komponen RecipeCard dengan tombol favorit (Adam)
+- [Telah Dibuat] Halaman recipes/index.tsx (list resep dengan search) (Adam)
+- [Telah Dibuat] Halaman recipes/[id].tsx (detail resep + bahan + langkah) (Adam)
+- [Telah Dibuat] Halaman favorites/index.tsx (list resep favorit) (Pangeran)
+- [Telah Dibuat] Navigasi dari halaman profile ke resep dan favorit (Adam)
+- [Telah Dibuat] QuickActions di home page mengarah ke halaman resep (Adam)
+- [Telah Dibuat] Type definitions untuk Recipe, RecipeProduct, FavoriteRecipe (Pangeran)
 
 ---
 
