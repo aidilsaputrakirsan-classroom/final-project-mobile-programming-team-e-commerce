@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, ShoppingCart, ClipboardList, User } from 'lucide-react-native';
+import { Home, ShoppingCart, ClipboardList, User, ChefHat } from 'lucide-react-native';
 import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -44,6 +44,13 @@ export default function TabsLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="recipes"
+        options={{
+          title: 'Resep',
+          tabBarIcon: ({ color, size }) => <ChefHat size={size} color={color} />,
         }}
       />
       <Tabs.Screen

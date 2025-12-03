@@ -7,10 +7,11 @@ import {
   TextInput,
   ActivityIndicator,
   RefreshControl,
+  TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Search, ChefHat } from 'lucide-react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Search, ChefHat, ArrowLeft } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { theme } from '@/theme';
 import { useRecipes } from '@/hooks/useRecipes';
@@ -21,7 +22,6 @@ import { Recipe } from '@/types/recipe';
 
 export default function RecipesScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
   const { recipes, isLoading, error, fetchRecipes, toggleFavorite, getFavoriteIds } =
     useRecipes();
@@ -108,74 +108,108 @@ export default function RecipesScreen() {
   // Loading state
   if (isLoading && recipes.length === 0) {
     return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={styles.loadingText}>Memuat resep...</Text>
-      </View>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={styles.loadingText}>Memuat resep...</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <View style={styles.searchInputWrapper}>
-          <Search size={20} color={theme.colors.textSecondary} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Cari resep..."
-            placeholderTextColor={theme.colors.textSecondary}
-            value={searchQuery}
-            onChangeText={handleSearch}
-          />
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <ArrowLeft size={24} color={theme.colors.text} />
+            </TouchableOpacity>
+          <Text style={styles.headerTitle}>Resep Makanan</Text>
+          <View style={styles.headerSpacer} />
         </View>
-      </View>
 
-      {/* Error State */}
-      {error && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-        </View>
-      )}
-
-      {/* Recipe List */}
-      {recipes.length === 0 && !isLoading ? (
-        <EmptyState
-          title="Resep Tidak Ditemukan"
-          message={
-            searchQuery
-              ? 'Coba kata kunci lain untuk menemukan resep yang kamu cari'
-              : 'Resep akan segera hadir, nantikan ya!'
-          }
-          icon={<ChefHat size={64} color={theme.colors.textSecondary} />}
-        />
-      ) : (
-        <FlatList
-          data={recipes}
-          renderItem={renderRecipeItem}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          columnWrapperStyle={styles.columnWrapper}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={[theme.colors.primary]}
-              tintColor={theme.colors.primary}
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <View style={styles.searchInputWrapper}>
+            <Search size={20} color={theme.colors.textSecondary} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Cari resep..."
+              placeholderTextColor={theme.colors.textSecondary}
+              value={searchQuery}
+              onChangeText={handleSearch}
             />
-          }
-        />
-      )}
-    </View>
+          </View>
+        </View>
+
+        {/* Error State */}
+        {error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        )}
+
+        {/* Recipe List */}
+        {recipes.length === 0 && !isLoading ? (
+          <EmptyState
+            title="Resep Tidak Ditemukan"
+            message={
+              searchQuery
+                ? 'Coba kata kunci lain untuk menemukan resep yang kamu cari'
+                : 'Resep akan segera hadir, nantikan ya!'
+            }
+            icon={<ChefHat size={64} color={theme.colors.textSecondary} />}
+          />
+        ) : (
+          <FlatList
+            data={recipes}
+            renderItem={renderRecipeItem}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            columnWrapperStyle={styles.columnWrapper}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                colors={[theme.colors.primary]}
+                tintColor={theme.colors.primary}
+              />
+            }
+          />
+        )}
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+  },
+  header: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
+    paddingBottom: theme.spacing.sm,
+  },
+  headerTitle: {
+    fontSize: theme.fontSize.xxl,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.text,
+  },
+    backButton: {
+    padding: theme.spacing.xs,
+  },
+    headerSpacer: {
+    width: 32,
   },
   centerContainer: {
     flex: 1,

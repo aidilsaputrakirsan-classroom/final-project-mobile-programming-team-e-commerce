@@ -4,12 +4,12 @@ import {
   Text,
   StyleSheet,
   FlatList,
+  TextInput,
   ActivityIndicator,
   RefreshControl,
-  TouchableOpacity,
 } from 'react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
-import { Heart, ArrowLeft } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { Search, ChefHat } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { theme } from '@/theme';
@@ -19,52 +19,70 @@ import { RecipeCard } from '@/components/RecipeCard';
 import { EmptyState } from '@/components/EmptyState';
 import { Recipe } from '@/types/recipe';
 
-export default function FavoritesScreen() {
+export default function RecipesTabScreen() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
-  const { favorites, isLoading, error, fetchMyFavorites, toggleFavorite } = useRecipes();
+  const { user } = useAuthStore();
+  const { recipes, isLoading, error, fetchRecipes, toggleFavorite, getFavoriteIds } =
+    useRecipes();
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [localFavorites, setLocalFavorites] = useState<Recipe[]>([]);
+  const [searchTimeout, setSearchTimeout] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
 
-  // Redirect ke login jika belum login
+  // Load resep dan favorit saat mount
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/(auth)/login');
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    await fetchRecipes();
+    if (user?.id) {
+      const ids = await getFavoriteIds(user.id);
+      setFavoriteIds(ids);
     }
-  }, [isAuthenticated]);
-
-  // Load favorit saat fokus
-  useFocusEffect(
-    useCallback(() => {
-      if (user?.id) {
-        loadFavorites();
-      }
-    }, [user?.id]),
-  );
-
-  const loadFavorites = async () => {
-    if (!user?.id) return;
-    const data = await fetchMyFavorites(user.id);
-    setLocalFavorites(data);
   };
+
+  // Debounce search
+  const handleSearch = useCallback(
+    (text: string) => {
+      setSearchQuery(text);
+
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+
+      const timeout = setTimeout(() => {
+        fetchRecipes(text.trim() || undefined);
+      }, 300);
+
+      setSearchTimeout(timeout);
+    },
+    [fetchRecipes, searchTimeout],
+  );
 
   // Pull to refresh
   const handleRefresh = async () => {
     setRefreshing(true);
-    await loadFavorites();
+    await loadData();
     setRefreshing(false);
   };
 
-  // Toggle favorit (hapus dari favorit)
+  // Toggle favorit
   const handleToggleFavorite = async (recipeId: string) => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      router.push('/(auth)/login');
+      return;
+    }
 
     const result = await toggleFavorite(user.id, recipeId);
 
-    // Jika dihapus dari favorit, update local state
-    if (!result.isFavorite) {
-      setLocalFavorites((prev) => prev.filter((r) => r.id !== recipeId));
+    if (result.isFavorite) {
+      setFavoriteIds((prev) => [...prev, recipeId]);
+    } else {
+      setFavoriteIds((prev) => prev.filter((id) => id !== recipeId));
     }
   };
 
@@ -78,41 +96,47 @@ export default function FavoritesScreen() {
     <View style={styles.cardWrapper}>
       <RecipeCard
         recipe={item}
-        isFavorite={true}
+        isFavorite={favoriteIds.includes(item.id)}
         onPress={() => handlePressRecipe(item)}
         onToggleFavorite={() => handleToggleFavorite(item.id)}
-        showFavoriteButton={true}
+        showFavoriteButton={!!user}
       />
     </View>
   );
 
   // Loading state
-  if (isLoading && localFavorites.length === 0) {
+  if (isLoading && recipes.length === 0) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text style={styles.loadingText}>Memuat resep favorit...</Text>
+          <Text style={styles.loadingText}>Memuat resep...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  // Not authenticated
-  if (!isAuthenticated) {
-    return null;
-  }
-
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.container}>
-        {/* Header dengan back button */}
+        
+        {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <ArrowLeft size={24} color={theme.colors.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Resep Favorit</Text>
-          <View style={styles.headerSpacer} />
+          <Text style={styles.headerTitle}>Resep Makanan</Text>
+        </View>
+
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <View style={styles.searchInputWrapper}>
+            <Search size={20} color={theme.colors.textSecondary} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Cari resep..."
+              placeholderTextColor={theme.colors.textSecondary}
+              value={searchQuery}
+              onChangeText={handleSearch}
+            />
+          </View>
         </View>
 
         {/* Error State */}
@@ -122,18 +146,20 @@ export default function FavoritesScreen() {
           </View>
         )}
 
-        {/* Favorites List */}
-        {localFavorites.length === 0 && !isLoading ? (
+        {/* Recipe List */}
+        {recipes.length === 0 && !isLoading ? (
           <EmptyState
-            title="Belum Ada Resep Favorit"
-            message="Simpan resep yang kamu sukai dengan menekan ikon hati di halaman resep"
-            icon={<Heart size={64} color={theme.colors.textSecondary} />}
-            actionLabel="Jelajahi Resep"
-            onAction={() => router.push('/recipes')}
+            title="Resep Tidak Ditemukan"
+            message={
+              searchQuery
+                ? 'Coba kata kunci lain untuk menemukan resep yang kamu cari'
+                : 'Resep akan segera hadir, nantikan ya!'
+            }
+            icon={<ChefHat size={64} color={theme.colors.textSecondary} />}
           />
         ) : (
           <FlatList
-            data={localFavorites}
+            data={recipes}
             renderItem={renderRecipeItem}
             keyExtractor={(item) => item.id}
             numColumns={2}
@@ -147,13 +173,6 @@ export default function FavoritesScreen() {
                 colors={[theme.colors.primary]}
                 tintColor={theme.colors.primary}
               />
-            }
-            ListHeaderComponent={
-              <View style={styles.headerInfo}>
-                <Text style={styles.headerText}>
-                  {localFavorites.length} resep favorit
-                </Text>
-              </View>
             }
           />
         )}
@@ -171,26 +190,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
-  },
-  backButton: {
-    padding: theme.spacing.xs,
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: theme.fontSize.xl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text,
-    textAlign: 'center',
-  },
-  headerSpacer: {
-    width: 32,
-  },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -201,6 +200,36 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.md,
     fontSize: theme.fontSize.md,
     color: theme.colors.textSecondary,
+  },
+  header: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
+    paddingBottom: theme.spacing.sm,
+  },
+  headerTitle: {
+    fontSize: theme.fontSize.xxl,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.text,
+  },
+  searchContainer: {
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    backgroundColor: theme.colors.background,
+  },
+  searchInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.lg,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    gap: theme.spacing.sm,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: theme.fontSize.md,
+    color: theme.colors.text,
   },
   errorContainer: {
     backgroundColor: `${theme.colors.error}10`,
@@ -213,15 +242,6 @@ const styles = StyleSheet.create({
     color: theme.colors.error,
     fontSize: theme.fontSize.sm,
     textAlign: 'center',
-  },
-  headerInfo: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    marginBottom: theme.spacing.sm,
-  },
-  headerText: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
   },
   listContent: {
     padding: theme.spacing.md,

@@ -46,6 +46,8 @@ export default function RootLayout() {
       <Stack.Screen name="product" options={{ headerShown: false }} />
       <Stack.Screen name="order" options={{ headerShown: false }} />
       <Stack.Screen name="admin" options={{ headerShown: false }} />
+      <Stack.Screen name="recipes" options={{ headerShown: false }} />
+      <Stack.Screen name="favorites" options={{ headerShown: false }} />
     </Stack>
   );
 }

@@ -23,7 +23,7 @@ export default function FavoritesLayout() {
         name="index"
         options={{
           title: 'Resep Favorit',
-          headerShown: true,
+          headerShown: false,
         }}
       />
     </Stack>

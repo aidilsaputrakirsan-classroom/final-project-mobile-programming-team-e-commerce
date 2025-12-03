@@ -8,6 +8,8 @@ import {
   Package,
   CheckCircle,
   AlertCircle,
+  SlidersHorizontal,
+  ArrowUpDown,
 } from 'lucide-react-native';
 import React, { useCallback, useMemo, useState, useRef } from 'react';
 import {
@@ -23,6 +25,7 @@ import {
   ActivityIndicator,
   Modal,
   Pressable,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -34,6 +37,27 @@ import { formatCurrency } from '@/libs/currency';
 import { theme } from '@/theme';
 import { Product } from '@/types/product';
 
+type SortOption =
+  | 'name_asc'
+  | 'name_desc'
+  | 'price_asc'
+  | 'price_desc'
+  | 'stock_asc'
+  | 'stock_desc'
+  | 'newest'
+  | 'oldest';
+
+const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: 'name_asc', label: 'Nama A-Z' },
+  { value: 'name_desc', label: 'Nama Z-A' },
+  { value: 'price_asc', label: 'Harga Terendah' },
+  { value: 'price_desc', label: 'Harga Tertinggi' },
+  { value: 'stock_asc', label: 'Stok Terendah' },
+  { value: 'stock_desc', label: 'Stok Tertinggi' },
+  { value: 'newest', label: 'Terbaru' },
+  { value: 'oldest', label: 'Terlama' },
+];
+
 export default function AdminProductsScreen() {
   const router = useRouter();
   const { user } = useAuth();
@@ -44,22 +68,66 @@ export default function AdminProductsScreen() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [sortOption, setSortOption] = useState<SortOption>('newest');
+  const [showSortModal, setShowSortModal] = useState(false);
   const menuPosition = useRef({ x: 0, y: 0 });
 
   const isAdmin = user?.role === 'admin';
 
-  // Filter produk berdasarkan search query
+  // Filter dan sort produk
   const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) return products;
+    let result = [...products];
 
-    const query = searchQuery.toLowerCase();
-    return products.filter(
-      (product) =>
-        product.name.toLowerCase().includes(query) ||
-        product.description?.toLowerCase().includes(query) ||
-        product.category?.toLowerCase().includes(query),
-    );
-  }, [products, searchQuery]);
+    // Filter berdasarkan search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (product) =>
+          product.name.toLowerCase().includes(query) ||
+          product.description?.toLowerCase().includes(query) ||
+          product.category?.toLowerCase().includes(query),
+      );
+    }
+
+    // Sort berdasarkan opsi yang dipilih
+    switch (sortOption) {
+      case 'name_asc':
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'name_desc':
+        result.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'price_asc':
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case 'price_desc':
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case 'stock_asc':
+        result.sort((a, b) => a.stock - b.stock);
+        break;
+      case 'stock_desc':
+        result.sort((a, b) => b.stock - a.stock);
+        break;
+      case 'newest':
+        result.sort(
+          (a, b) =>
+            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime(),
+        );
+        break;
+      case 'oldest':
+        result.sort(
+          (a, b) =>
+            new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime(),
+        );
+        break;
+    }
+
+    return result;
+  }, [products, searchQuery, sortOption]);
+
+  const currentSortLabel =
+    SORT_OPTIONS.find((o) => o.value === sortOption)?.label || 'Urutkan';
 
   const loadProducts = useCallback(async () => {
     if (!isAdmin) return;
@@ -116,7 +184,10 @@ export default function AdminProductsScreen() {
     ]);
   };
 
-  const openMenu = (product: Product, event: { nativeEvent: { pageX: number; pageY: number } }) => {
+  const openMenu = (
+    product: Product,
+    event: { nativeEvent: { pageX: number; pageY: number } },
+  ) => {
     menuPosition.current = { x: event.nativeEvent.pageX, y: event.nativeEvent.pageY };
     setSelectedProduct(product);
     setMenuVisible(true);
@@ -242,6 +313,17 @@ export default function AdminProductsScreen() {
         </View>
       </View>
 
+      {/* Sort Filter */}
+      <View style={styles.filterContainer}>
+        <TouchableOpacity
+          style={styles.sortButton}
+          onPress={() => setShowSortModal(true)}
+        >
+          <ArrowUpDown size={16} color={theme.colors.primary} />
+          <Text style={styles.sortButtonText}>{currentSortLabel}</Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Stats - Compact Modern Style */}
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
@@ -323,8 +405,59 @@ export default function AdminProductsScreen() {
             </TouchableOpacity>
             <View style={styles.menuDivider} />
             <TouchableOpacity style={styles.menuItem} onPress={handleDeleteFromMenu}>
-              <Text style={[styles.menuItemText, styles.menuItemTextDanger]}>Hapus Produk</Text>
+              <Text style={[styles.menuItemText, styles.menuItemTextDanger]}>
+                Hapus Produk
+              </Text>
             </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
+
+      {/* Sort Modal */}
+      <Modal
+        visible={showSortModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowSortModal(false)}
+      >
+        <Pressable
+          style={styles.sortModalOverlay}
+          onPress={() => setShowSortModal(false)}
+        >
+          <View style={styles.sortModalContainer}>
+            <View style={styles.sortModalHeader}>
+              <Text style={styles.sortModalTitle}>Urutkan Berdasarkan</Text>
+              <TouchableOpacity onPress={() => setShowSortModal(false)}>
+                <X size={24} color={theme.colors.text} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.sortOptionsList}>
+              {SORT_OPTIONS.map((option) => (
+                <TouchableOpacity
+                  key={option.value}
+                  style={[
+                    styles.sortOptionItem,
+                    sortOption === option.value && styles.sortOptionItemActive,
+                  ]}
+                  onPress={() => {
+                    setSortOption(option.value);
+                    setShowSortModal(false);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.sortOptionText,
+                      sortOption === option.value && styles.sortOptionTextActive,
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                  {sortOption === option.value && (
+                    <CheckCircle size={20} color={theme.colors.primary} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
         </Pressable>
       </Modal>
@@ -382,6 +515,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.sm,
     fontSize: theme.fontSize.md,
     color: theme.colors.text,
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: theme.spacing.md,
+    paddingBottom: theme.spacing.sm,
+    backgroundColor: theme.colors.background,
+  },
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: `${theme.colors.primary}15`,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.borderRadius.lg,
+    gap: theme.spacing.xs,
+  },
+  sortButtonText: {
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.primary,
+    fontWeight: theme.fontWeight.medium,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -567,6 +720,52 @@ const styles = StyleSheet.create({
   backHomeButtonText: {
     color: theme.colors.background,
     fontSize: theme.fontSize.md,
+    fontWeight: theme.fontWeight.semibold,
+  },
+  sortModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'flex-end',
+  },
+  sortModalContainer: {
+    backgroundColor: theme.colors.background,
+    borderTopLeftRadius: theme.borderRadius.xl,
+    borderTopRightRadius: theme.borderRadius.xl,
+    maxHeight: '60%',
+  },
+  sortModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  sortModalTitle: {
+    fontSize: theme.fontSize.lg,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.text,
+  },
+  sortOptionsList: {
+    paddingVertical: theme.spacing.sm,
+  },
+  sortOptionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
+  },
+  sortOptionItemActive: {
+    backgroundColor: `${theme.colors.primary}10`,
+  },
+  sortOptionText: {
+    fontSize: theme.fontSize.md,
+    color: theme.colors.text,
+  },
+  sortOptionTextActive: {
+    color: theme.colors.primary,
     fontWeight: theme.fontWeight.semibold,
   },
 });

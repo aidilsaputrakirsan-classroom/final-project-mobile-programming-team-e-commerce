@@ -143,12 +143,6 @@ export default function ProfileScreen() {
             />
             <View style={styles.menuDivider} />
             <MenuItem
-              icon={<ChefHat size={20} color={theme.colors.secondary} />}
-              label="Resep Masakan"
-              onPress={() => router.push('/recipes')}
-            />
-            <View style={styles.menuDivider} />
-            <MenuItem
               icon={<Heart size={20} color={theme.colors.error} />}
               label="Resep Favorit"
               onPress={() => router.push('/favorites')}
@@ -171,6 +165,12 @@ export default function ProfileScreen() {
                 icon={<Shield size={20} color={theme.colors.secondary} />}
                 label="Kelola Pesanan"
                 onPress={() => router.push('/admin/orders')}
+              />
+              <View style={styles.menuDivider} />
+              <MenuItem
+                icon={<ChefHat size={20} color={theme.colors.warning} />}
+                label="Kelola Resep"
+                onPress={() => handleComingSoon('Kelola Resep')}
               />
             </View>
           </View>

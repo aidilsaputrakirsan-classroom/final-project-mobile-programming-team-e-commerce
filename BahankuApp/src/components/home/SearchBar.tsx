@@ -1,4 +1,4 @@
-import { Search, Camera } from 'lucide-react-native';
+import { Search, SlidersHorizontal } from 'lucide-react-native';
 import React from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
@@ -8,37 +8,35 @@ interface SearchBarProps {
   value: string;
   onChangeText: (text: string) => void;
   onSubmit: () => void;
-  onCameraPress?: () => void;
+  onFilterPress?: () => void;
 }
 
 export const SearchBar = ({
   value,
   onChangeText,
   onSubmit,
-  onCameraPress,
+  onFilterPress,
 }: SearchBarProps) => {
   return (
     <View style={styles.section}>
-      <View style={styles.searchWrapper}>
-        <View style={styles.searchContainer}>
-          <Search size={20} color="#9CA3AF" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Cari bahan dapur..."
-            placeholderTextColor="#9CA3AF"
-            value={value}
-            onChangeText={onChangeText}
-            onSubmitEditing={onSubmit}
-            returnKeyType="search"
-          />
-          <TouchableOpacity
-            style={styles.cameraButton}
-            onPress={onCameraPress}
-            activeOpacity={0.8}
-          >
-            <Camera size={20} color="#6B7280" />
-          </TouchableOpacity>
-        </View>
+      <View style={styles.searchContainer}>
+        <Search size={20} color="#9CA3AF" />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Cari bahan dapur..."
+          placeholderTextColor="#9CA3AF"
+          value={value}
+          onChangeText={onChangeText}
+          onSubmitEditing={onSubmit}
+          returnKeyType="search"
+        />
+        <TouchableOpacity
+          style={styles.filterButton}
+          onPress={onFilterPress}
+          activeOpacity={0.8}
+        >
+          <SlidersHorizontal size={20} color={theme.colors.primary} />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -49,13 +47,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.md,
     backgroundColor: '#FFFFFF',
-  },
-  searchWrapper: {
-    borderRadius: theme.borderRadius.lg,
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: theme.spacing.sm,
-    backgroundColor: '#FFFFFF',
-    ...theme.shadows.sm,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -74,9 +65,9 @@ const styles = StyleSheet.create({
     color: '#1F2937',
     paddingVertical: 0,
   },
-  cameraButton: {
+  filterButton: {
     padding: theme.spacing.sm,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: `${theme.colors.primary}15`,
     borderRadius: theme.borderRadius.full,
   },
 });

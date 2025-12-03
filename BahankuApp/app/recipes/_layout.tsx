@@ -23,7 +23,7 @@ export default function RecipesLayout() {
         name="index"
         options={{
           title: 'Resep Masakan',
-          headerShown: true,
+          headerShown: false,
         }}
       />
       <Stack.Screen
