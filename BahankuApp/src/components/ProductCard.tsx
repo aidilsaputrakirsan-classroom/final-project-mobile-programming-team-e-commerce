@@ -10,6 +10,8 @@ interface ProductCardProps {
   price: number;
   image_url?: string;
   stock: number;
+  discountPercent?: number;
+  discountedPrice?: number;
   onPress?: () => void;
 }
 
@@ -18,9 +20,12 @@ export function ProductCard({
   price,
   image_url,
   stock,
+  discountPercent,
+  discountedPrice,
   onPress,
 }: ProductCardProps) {
   const isOutOfStock = stock <= 0;
+  const hasDiscount = discountPercent && discountPercent > 0 && discountedPrice;
 
   return (
     <Pressable
@@ -40,6 +45,11 @@ export function ProductCard({
           style={[styles.image, isOutOfStock && styles.imageDisabled]}
           resizeMode="cover"
         />
+        {hasDiscount && !isOutOfStock ? (
+          <View style={styles.discountBadge}>
+            <Text style={styles.discountText}>-{discountPercent}%</Text>
+          </View>
+        ) : null}
         {isOutOfStock ? (
           <View style={styles.outOfStockBadge}>
             <Text style={styles.outOfStockText}>Habis</Text>
@@ -54,9 +64,18 @@ export function ProductCard({
         >
           {name}
         </Text>
-        <Text style={[styles.price, isOutOfStock && styles.textDisabled]}>
-          {formatCurrency(price)}
-        </Text>
+        {hasDiscount ? (
+          <View style={styles.priceContainer}>
+            <Text style={styles.originalPrice}>{formatCurrency(price)}</Text>
+            <Text style={[styles.price, isOutOfStock && styles.textDisabled]}>
+              {formatCurrency(discountedPrice)}
+            </Text>
+          </View>
+        ) : (
+          <Text style={[styles.price, isOutOfStock && styles.textDisabled]}>
+            {formatCurrency(price)}
+          </Text>
+        )}
         <Text style={[styles.stock, isOutOfStock && styles.stockEmpty]}>
           {isOutOfStock ? 'Stok Habis' : `Stok: ${stock}`}
         </Text>
@@ -89,6 +108,20 @@ const styles = StyleSheet.create({
   imageDisabled: {
     opacity: 0.5,
   },
+  discountBadge: {
+    position: 'absolute',
+    top: theme.spacing.sm,
+    left: theme.spacing.sm,
+    backgroundColor: theme.colors.error,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.sm,
+  },
+  discountText: {
+    color: '#FFFFFF',
+    fontSize: theme.fontSize.xs,
+    fontWeight: theme.fontWeight.bold,
+  },
   outOfStockBadge: {
     position: 'absolute',
     top: theme.spacing.sm,
@@ -111,6 +144,14 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.text,
     marginBottom: theme.spacing.xs,
+  },
+  priceContainer: {
+    marginBottom: theme.spacing.xs,
+  },
+  originalPrice: {
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.textSecondary,
+    textDecorationLine: 'line-through',
   },
   price: {
     fontSize: theme.fontSize.lg,

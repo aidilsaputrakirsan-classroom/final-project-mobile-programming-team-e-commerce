@@ -8,10 +8,9 @@ import {
   Package,
   CheckCircle,
   AlertCircle,
-  SlidersHorizontal,
   ArrowUpDown,
 } from 'lucide-react-native';
-import React, { useCallback, useMemo, useState, useRef } from 'react';
+import React, { useCallback, useMemo, useState, memo } from 'react';
 import {
   FlatList,
   RefreshControl,
@@ -26,6 +25,7 @@ import {
   Modal,
   Pressable,
   ScrollView,
+  InteractionManager,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -58,6 +58,63 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'oldest', label: 'Terlama' },
 ];
 
+// Memoized ProductItem component untuk optimize re-render
+interface ProductItemProps {
+  item: Product;
+  isDeleting: boolean;
+  onMenuPress: (product: Product) => void;
+}
+
+const ProductItem = memo(({ item, isDeleting, onMenuPress }: ProductItemProps) => {
+  return (
+    <View style={styles.productCard}>
+      <Image
+        source={{
+          uri: item.image_url || 'https://via.placeholder.com/100x100?text=No+Image',
+        }}
+        style={styles.productImage}
+      />
+      <View style={styles.productInfo}>
+        <Text style={styles.productName} numberOfLines={2}>
+          {item.name}
+        </Text>
+        <Text style={styles.productPrice}>{formatCurrency(item.price)}</Text>
+        <Text style={styles.productCategory} numberOfLines={1}>
+          {item.category || 'Tanpa Kategori'}
+        </Text>
+        <View style={styles.stockContainer}>
+          <View
+            style={[
+              styles.stockBadge,
+              item.stock > 0 ? styles.stockAvailable : styles.stockEmpty,
+            ]}
+          >
+            <Text
+              style={[
+                styles.stockText,
+                item.stock > 0 ? styles.stockTextAvailable : styles.stockTextEmpty,
+              ]}
+            >
+              Stok {item.stock}
+            </Text>
+          </View>
+        </View>
+      </View>
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={() => onMenuPress(item)}
+        disabled={isDeleting}
+      >
+        {isDeleting ? (
+          <ActivityIndicator size="small" color={theme.colors.textSecondary} />
+        ) : (
+          <MoreVertical size={20} color={theme.colors.textSecondary} />
+        )}
+      </TouchableOpacity>
+    </View>
+  );
+});
+
 export default function AdminProductsScreen() {
   const router = useRouter();
   const { user } = useAuth();
@@ -70,7 +127,6 @@ export default function AdminProductsScreen() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [sortOption, setSortOption] = useState<SortOption>('newest');
   const [showSortModal, setShowSortModal] = useState(false);
-  const menuPosition = useRef({ x: 0, y: 0 });
 
   const isAdmin = user?.role === 'admin';
 
@@ -160,103 +216,65 @@ export default function AdminProductsScreen() {
 
   const handleDeleteProduct = (product: Product) => {
     setMenuVisible(false);
-    Alert.alert('Hapus Produk', `Apakah Anda yakin ingin menghapus "${product.name}"?`, [
-      { text: 'Batal', style: 'cancel' },
-      {
-        text: 'Hapus',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            setDeletingId(product.id);
-            const success = await deleteProduct(product.id);
-            if (success) {
-              Alert.alert('Berhasil', 'Produk berhasil dihapus');
-            } else {
-              Alert.alert('Gagal', 'Gagal menghapus produk');
+    // Delay alert untuk memberi waktu modal close animation
+    InteractionManager.runAfterInteractions(() => {
+      Alert.alert('Hapus Produk', `Apakah Anda yakin ingin menghapus "${product.name}"?`, [
+        { text: 'Batal', style: 'cancel' },
+        {
+          text: 'Hapus',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setDeletingId(product.id);
+              const success = await deleteProduct(product.id);
+              if (success) {
+                Alert.alert('Berhasil', 'Produk berhasil dihapus');
+              } else {
+                Alert.alert('Gagal', 'Gagal menghapus produk');
+              }
+            } catch {
+              Alert.alert('Error', 'Terjadi kesalahan saat menghapus produk');
+            } finally {
+              setDeletingId(null);
             }
-          } catch {
-            Alert.alert('Error', 'Terjadi kesalahan saat menghapus produk');
-          } finally {
-            setDeletingId(null);
-          }
+          },
         },
-      },
-    ]);
+      ]);
+    });
   };
 
-  const openMenu = (
-    product: Product,
-    event: { nativeEvent: { pageX: number; pageY: number } },
-  ) => {
-    menuPosition.current = { x: event.nativeEvent.pageX, y: event.nativeEvent.pageY };
+  // Simplified menu handler - tidak perlu event coordinates
+  const openMenu = useCallback((product: Product) => {
     setSelectedProduct(product);
     setMenuVisible(true);
-  };
+  }, []);
 
-  const handleEditFromMenu = () => {
+  const handleEditFromMenu = useCallback(() => {
     if (selectedProduct) {
+      const productId = selectedProduct.id;
       setMenuVisible(false);
-      router.push(`/admin/product-form?id=${selectedProduct.id}`);
+      // Delay navigation untuk memberi waktu modal close
+      InteractionManager.runAfterInteractions(() => {
+        router.push(`/admin/product-form?id=${productId}`);
+      });
     }
-  };
+  }, [selectedProduct, router]);
 
-  const handleDeleteFromMenu = () => {
+  const handleDeleteFromMenu = useCallback(() => {
     if (selectedProduct) {
       handleDeleteProduct(selectedProduct);
     }
-  };
+  }, [selectedProduct]);
 
-  const renderProductItem = ({ item }: { item: Product }) => {
-    const isDeleting = deletingId === item.id;
-
+  const renderProductItem = useCallback(({ item }: { item: Product }) => {
     return (
-      <View style={styles.productCard}>
-        <Image
-          source={{
-            uri: item.image_url || 'https://via.placeholder.com/100x100?text=No+Image',
-          }}
-          style={styles.productImage}
-        />
-        <View style={styles.productInfo}>
-          <Text style={styles.productName} numberOfLines={2}>
-            {item.name}
-          </Text>
-          <Text style={styles.productPrice}>{formatCurrency(item.price)}</Text>
-          <Text style={styles.productCategory} numberOfLines={1}>
-            {item.category || 'Tanpa Kategori'}
-          </Text>
-          <View style={styles.stockContainer}>
-            <View
-              style={[
-                styles.stockBadge,
-                item.stock > 0 ? styles.stockAvailable : styles.stockEmpty,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.stockText,
-                  item.stock > 0 ? styles.stockTextAvailable : styles.stockTextEmpty,
-                ]}
-              >
-                Stok {item.stock}
-              </Text>
-            </View>
-          </View>
-        </View>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={(event) => openMenu(item, event)}
-          disabled={isDeleting}
-        >
-          {isDeleting ? (
-            <ActivityIndicator size="small" color={theme.colors.textSecondary} />
-          ) : (
-            <MoreVertical size={20} color={theme.colors.textSecondary} />
-          )}
-        </TouchableOpacity>
-      </View>
+      <ProductItem
+        item={item}
+        isDeleting={deletingId === item.id}
+        onMenuPress={openMenu}
+      />
     );
-  };
+  }, [deletingId, openMenu]);
 
   // Cek apakah user adalah admin
   if (!isAdmin) {

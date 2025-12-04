@@ -45,6 +45,8 @@ export const ProductGridSection = ({
                 price={item.price}
                 image_url={item.image_url}
                 stock={item.stock}
+                discountPercent={item.discount_percent}
+                discountedPrice={item.discounted_price}
                 onPress={() => onProductPress(item)}
               />
             </View>

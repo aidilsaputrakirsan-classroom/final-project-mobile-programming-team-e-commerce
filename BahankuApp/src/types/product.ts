@@ -9,6 +9,8 @@ export interface Product {
   created_at?: string;
   updated_at?: string;
   category?: string; // Category name for display
+  discount_percent?: number;
+  discounted_price?: number;
 }
 
 export interface Category {

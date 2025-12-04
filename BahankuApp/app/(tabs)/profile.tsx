@@ -9,6 +9,8 @@ import {
   Shield,
   ShoppingBag,
   ChefHat,
+  Tag,
+  Percent,
 } from 'lucide-react-native';
 import React from 'react';
 import {
@@ -170,7 +172,19 @@ export default function ProfileScreen() {
               <MenuItem
                 icon={<ChefHat size={20} color={theme.colors.warning} />}
                 label="Kelola Resep"
-                onPress={() => handleComingSoon('Kelola Resep')}
+                onPress={() => router.push('/admin/recipes')}
+              />
+              <View style={styles.menuDivider} />
+              <MenuItem
+                icon={<Tag size={20} color={theme.colors.info} />}
+                label="Kelola Kategori"
+                onPress={() => router.push('/admin/categories')}
+              />
+              <View style={styles.menuDivider} />
+              <MenuItem
+                icon={<Percent size={20} color={theme.colors.error} />}
+                label="Kelola Diskon"
+                onPress={() => router.push('/admin/discounts')}
               />
             </View>
           </View>

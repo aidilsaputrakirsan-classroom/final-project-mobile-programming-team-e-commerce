@@ -20,7 +20,7 @@ export function useProducts(options: UseProductsOptions = {}) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Ambil semua produk dengan filter
+  // Ambil semua produk dengan filter dan diskon aktif
   const fetchProducts = useCallback(async (filters?: ProductFilters) => {
     setIsLoading(true);
     setError(null);
@@ -60,11 +60,35 @@ export function useProducts(options: UseProductsOptions = {}) {
 
       if (fetchError) throw fetchError;
 
+      // Ambil diskon aktif
+      const now = new Date().toISOString();
+      const { data: discounts } = await supabase
+        .from('product_discounts')
+        .select('product_id, discount_percent')
+        .eq('is_active', true)
+        .lte('start_date', now)
+        .gte('end_date', now);
+
+      // Map diskon ke produk
+      const discountMap = new Map<string, number>();
+      discounts?.forEach((d) => {
+        discountMap.set(d.product_id, d.discount_percent);
+      });
+
       const normalized =
-        data?.map((item) => ({
-          ...item,
-          category: item.categories?.name ?? item.category,
-        })) || [];
+        data?.map((item) => {
+          const discountPercent = discountMap.get(item.id);
+          const discountedPrice = discountPercent
+            ? Math.round(item.price * (1 - discountPercent / 100))
+            : undefined;
+
+          return {
+            ...item,
+            category: item.categories?.name ?? item.category,
+            discount_percent: discountPercent,
+            discounted_price: discountedPrice,
+          };
+        }) || [];
 
       setProducts(normalized);
     } catch (err) {

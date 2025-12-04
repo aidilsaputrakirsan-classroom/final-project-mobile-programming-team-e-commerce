@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -11,6 +11,8 @@ import {
   QuickActions,
   ProductGridSection,
   RecommendationsSection,
+  FilterModal,
+  FilterOptions,
 } from '@/components/home';
 import { useAuth } from '@/hooks/useAuth';
 import { useProducts } from '@/hooks/useProducts';
@@ -24,6 +26,14 @@ export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<FilterOptions>({
+    category: 'all',
+    minPrice: '',
+    maxPrice: '',
+    inStock: false,
+    sortBy: 'newest',
+  });
 
   const categories = useMemo(() => {
     const unique = Array.from(
@@ -44,11 +54,54 @@ export default function HomeScreen() {
   }, [products]);
 
   const filteredProducts = useMemo(() => {
-    if (selectedCategory === 'all') return products;
-    return products.filter(
-      (product) => product.category?.toLowerCase() === selectedCategory.toLowerCase(),
-    );
-  }, [products, selectedCategory]);
+    let result = [...products];
+
+    // Filter berdasarkan kategori (dari chip atau filter modal)
+    const categoryToUse = activeFilters.category !== 'all' ? activeFilters.category : selectedCategory;
+    if (categoryToUse !== 'all') {
+      result = result.filter(
+        (product) => product.category?.toLowerCase() === categoryToUse.toLowerCase(),
+      );
+    }
+
+    // Filter berdasarkan harga minimum
+    if (activeFilters.minPrice) {
+      const minPrice = Number(activeFilters.minPrice);
+      result = result.filter((product) => product.price >= minPrice);
+    }
+
+    // Filter berdasarkan harga maksimum
+    if (activeFilters.maxPrice) {
+      const maxPrice = Number(activeFilters.maxPrice);
+      result = result.filter((product) => product.price <= maxPrice);
+    }
+
+    // Filter berdasarkan stok
+    if (activeFilters.inStock) {
+      result = result.filter((product) => product.stock > 0);
+    }
+
+    // Sort
+    switch (activeFilters.sortBy) {
+      case 'price_asc':
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case 'price_desc':
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case 'name_asc':
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'newest':
+      default:
+        result.sort((a, b) => 
+          new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+        );
+        break;
+    }
+
+    return result;
+  }, [products, selectedCategory, activeFilters]);
 
   const handleSearch = async () => {
     await fetchProducts({ search: searchQuery });
@@ -63,6 +116,24 @@ export default function HomeScreen() {
   const handleProductPress = (product: Product) => {
     router.push(`/product/${product.id}`);
   };
+
+  const handleFilterPress = useCallback(() => {
+    setShowFilterModal(true);
+  }, []);
+
+  const handleApplyFilters = useCallback((filters: FilterOptions) => {
+    setActiveFilters(filters);
+    // Sync category with CategoryFilter chip
+    if (filters.category !== 'all') {
+      setSelectedCategory(filters.category);
+    }
+  }, []);
+
+  const handleCategoryChange = useCallback((category: string) => {
+    setSelectedCategory(category);
+    // Sync with filter modal
+    setActiveFilters((prev) => ({ ...prev, category }));
+  }, []);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
@@ -83,12 +154,13 @@ export default function HomeScreen() {
           value={searchQuery}
           onChangeText={setSearchQuery}
           onSubmit={handleSearch}
+          onFilterPress={handleFilterPress}
         />
 
         <CategoryFilter
           categories={categories}
           selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
+          onSelectCategory={handleCategoryChange}
         />
 
         <PromoBanner />
@@ -105,6 +177,14 @@ export default function HomeScreen() {
 
         <RecommendationsSection products={products} onProductPress={handleProductPress} />
       </ScrollView>
+
+      <FilterModal
+        visible={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        onApply={handleApplyFilters}
+        categories={categories}
+        initialFilters={activeFilters}
+      />
     </SafeAreaView>
   );
 }

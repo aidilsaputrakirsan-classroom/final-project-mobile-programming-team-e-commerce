@@ -268,6 +268,138 @@ export function useRecipes(options: UseRecipesOptions = {}) {
         }
     }, []);
 
+    // Buat resep baru (admin only)
+    const createRecipe = useCallback(
+        async (input: {
+            title: string;
+            description?: string;
+            image_url?: string;
+            steps?: string;
+            cooking_time?: number;
+            servings?: number;
+            difficulty?: string;
+        }): Promise<Recipe | null> => {
+            setIsLoading(true);
+            setError(null);
+
+            try {
+                const { data, error: createError } = await supabase
+                    .from('recipes')
+                    .insert([input])
+                    .select()
+                    .single();
+
+                if (createError) throw createError;
+
+                // Refresh list resep
+                await fetchRecipes();
+
+                return data;
+            } catch (err) {
+                const errorMessage =
+                    err instanceof Error ? err.message : 'Gagal membuat resep';
+                setError(errorMessage);
+                console.error('Error creating recipe:', err);
+                return null;
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        [fetchRecipes],
+    );
+
+    // Update resep (admin only)
+    const updateRecipe = useCallback(
+        async (
+            id: string,
+            input: {
+                title?: string;
+                description?: string;
+                image_url?: string;
+                steps?: string;
+                cooking_time?: number;
+                servings?: number;
+                difficulty?: string;
+            },
+        ): Promise<Recipe | null> => {
+            setIsLoading(true);
+            setError(null);
+
+            try {
+                const { data, error: updateError } = await supabase
+                    .from('recipes')
+                    .update({ ...input, updated_at: new Date().toISOString() })
+                    .eq('id', id)
+                    .select()
+                    .single();
+
+                if (updateError) throw updateError;
+
+                // Refresh list resep
+                await fetchRecipes();
+
+                return data;
+            } catch (err) {
+                const errorMessage =
+                    err instanceof Error ? err.message : 'Gagal mengupdate resep';
+                setError(errorMessage);
+                console.error('Error updating recipe:', err);
+                return null;
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        [fetchRecipes],
+    );
+
+    // Hapus resep (admin only)
+    const deleteRecipe = useCallback(
+        async (id: string): Promise<boolean> => {
+            setIsLoading(true);
+            setError(null);
+
+            try {
+                // Hapus recipe_products terkait terlebih dahulu
+                const { error: deleteProductsError } = await supabase
+                    .from('recipe_products')
+                    .delete()
+                    .eq('recipe_id', id);
+
+                if (deleteProductsError) throw deleteProductsError;
+
+                // Hapus favorite_recipes terkait
+                const { error: deleteFavoritesError } = await supabase
+                    .from('favorite_recipes')
+                    .delete()
+                    .eq('recipe_id', id);
+
+                if (deleteFavoritesError) throw deleteFavoritesError;
+
+                // Hapus resep
+                const { error: deleteError } = await supabase
+                    .from('recipes')
+                    .delete()
+                    .eq('id', id);
+
+                if (deleteError) throw deleteError;
+
+                // Refresh list resep
+                await fetchRecipes();
+
+                return true;
+            } catch (err) {
+                const errorMessage =
+                    err instanceof Error ? err.message : 'Gagal menghapus resep';
+                setError(errorMessage);
+                console.error('Error deleting recipe:', err);
+                return false;
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        [fetchRecipes],
+    );
+
     return {
         recipes,
         favorites,
@@ -279,5 +411,8 @@ export function useRecipes(options: UseRecipesOptions = {}) {
         toggleFavorite,
         fetchMyFavorites,
         getFavoriteIds,
+        createRecipe,
+        updateRecipe,
+        deleteRecipe,
     };
 }
