@@ -1,4 +1,7 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'expo-router';
 import React from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import {
   View,
   Text,
@@ -10,11 +13,9 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+
 import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from 'expo-router';
 
 const registerSchema = z
   .object({

@@ -1,106 +1,208 @@
-# BahanKu — Kamu System Instruction (Final)
+# BahanKu — AGENTS Instructions
 
-## Konteks Proyek
+Kamu adalah AI assistant untuk proyek BahanKu, aplikasi e-commerce bahan dapur berbasis React Native + TypeScript + Expo Router + Supabase.
 
-- Nama aplikasi: BahanKu — e-commerce bahan dapur (single-seller).
-- Teknologi utama: React Native, TypeScript, Expo Router, dan Supabase (digunakan untuk autentikasi, database Postgres, dan penyimpanan gambar).
-- Fokus utama adalah frontend yang berfungsi nyata, termasuk fitur autentikasi, katalog produk, keranjang belanja, proses checkout, resep, dan halaman admin.
-- Platform utama: Android, dengan kompatibilitas untuk iOS.
-- Semua komentar kode dan dokumentasi ditulis dalam Bahasa Indonesia.
+## Wajib Dibaca Sebelum Coding
 
-## Gaya Koding & Konvensi
+Sebelum menulis kode, SELALU baca file ini secara berurutan:
 
-- Gunakan TypeScript dengan strict mode.
-- Hindari penggunaan `any` kecuali memang benar-benar diperlukan.
-- Kode harus modular, fungsi kecil, dan mudah dibaca.
-- Untuk state global, gunakan Zustand yang disimpan dengan AsyncStorage.
-- Gunakan `react-hook-form` dan `zod` untuk kebutuhan form dan validasi.
-- Gunakan ikon dari lucide-react-native atau react-native-vector-icons.
-- Styling menggunakan StyleSheet atau inline style, tetapi tetap konsisten lewat konfigurasi di `src/theme`.
-- Gunakan pendekatan async/await, dan tangani error dengan try/catch.
-- Hindari penggunaan emoji secara berlebihan.
+1. `docs/Development_Checklist_BahanKu.md` — cek status task dan update setelah selesai
+2. `docs/Task_Assignment_BahanKu.md` — cek PIC, dependencies, dan estimasi
+3. `docs/prd/Requirements_BahanKu.md` — pahami requirement dan acceptance criteria
+4. `docs/prd/Implementation_Plan_BahanKu.md` — ikuti langkah implementasi yang sudah ditentukan
+5. `docs/prd/Design_Document_BahanKu.md` — pahami arsitektur dan pattern
 
-## Struktur Folder Utama
+Jangan skip langkah atau membuat struktur berbeda dari yang sudah didefinisikan di PRD.
+
+## Bantuan Dokumentasi Library
+
+Selalu gunakan Context7 saat membutuhkan code generation, setup atau langkah konfigurasi, atau dokumentasi library/API. Ini berarti kamu harus otomatis menggunakan Context7 MCP tools untuk resolve library id dan mendapatkan dokumentasi library tanpa user harus meminta secara eksplisit.
+
+## Prinsip Koding
+
+- Pakai TypeScript strict mode, hindari `any`
+- Fungsi maksimal 30 baris, extract logic kompleks ke hooks atau utils
+- State global pakai Zustand + persist ke AsyncStorage
+- Form pakai react-hook-form + zod untuk validasi
+- Import theme dari `src/theme/index.ts`, jangan hardcode warna atau spacing
+- Semua text UI dalam Bahasa Indonesia
+- Komentar kode teknis dalam Bahasa Indonesia, tidak naratif
+
+## Struktur Folder
 
 ```
-app/
-  (auth)/
-  (tabs)/
-  product/
-  admin/
-  recipes/
-  favorites/
+app/       → Expo Router pages (auth, tabs, product, admin, recipes, favorites)
 src/
-  components/
-  hooks/
-  store/
-  services/
-  libs/
-  theme/
-  types/
+  components/  → UI components reusable
+  hooks/       → Custom hooks (useAuth, useProducts, useOrders, useRecipes)
+  store/       → Zustand stores (cart, ui)
+  services/    → Supabase client, image upload
+  libs/        → Utilities (currency, helpers)
+  theme/       → Theme config (colors, spacing, typography)
+  types/       → TypeScript types
 ```
 
-## Pola Kode & Modul
+## Pattern yang Harus Diikuti
 
-- File Supabase client ada di `src/services/supabase.client.ts`.
-- Hook utama yang digunakan meliputi: `useAuth`, `useProducts`, `useOrders`, dan `useRecipes`.
-- Untuk manajemen state, gunakan store seperti `cart.store.ts` dan `ui.store.ts`.
-- Upload gambar dilakukan lewat modul `services/image.ts`.
-- Format harga menggunakan helper `libs/currency.ts`.
-- Validasi form menggunakan skema dari `zod`.
-- Navigasi dan routing dikelola dengan Expo Router.
-
-## Praktik Terbaik
-
-- Semua form wajib divalidasi menggunakan zod.
-- Tampilkan komponen `EmptyState` jika data kosong.
-- Setiap halaman harus punya indikator loading dan error handling.
-- Simpan sesi login user di AsyncStorage.
-- Semua teks yang tampil di UI ditulis dalam Bahasa Indonesia.
-- Hindari logika kompleks di UI, pindahkan ke dalam hooks.
-- Gunakan fungsi `formatCurrency()` untuk menampilkan harga.
-- Terapkan tema global dari `theme/index.ts`.
-- Gunakan alias `@/` untuk import dari folder `src`.
-
-## Git & Panduan Pull Request
-
-- Penamaan branch mengikuti format: `feature/<fitur>` atau `fix/<bug>`.
-- Format commit: gunakan awalan seperti `feat:`, `fix:`, `chore:`, `refactor:`.
-- Pesan commit ditulis dalam Bahasa Indonesia dan singkat.
-- Setiap pull request harus menyertakan deskripsi singkat dan langkah uji manual.
-- Reviewer utama untuk setiap PR adalah Pangeran (PBS).
-
-## Dependensi Utama
-
-- expo
-- react-native
-- expo-router
-- zustand
-- @react-native-async-storage/async-storage
-- @supabase/supabase-js
-- react-hook-form
-- zod
-- react-native-vector-icons
-
-## Tracking Pekerjaan
-
-- Sebelum mulai mengerjakan kode, Kamu wajib membaca file bernama "Development Checklist" di root proyek. File tersebut digunakan untuk melacak setiap langkah pekerjaan dan statusnya.
-- Contoh:
-  Jika sebelumnya: [Belum Dibuat] Buat hook useAuth  
-   Setelah selesai, ubah menjadi: [Telah Dibuat] Buat hook useAuth
-  Jika bagian masih dikerjakan, gunakan status: [Sedang Dikerjakan]
-
-## Instruksi CLI
-
-- Seluruh perintah terminal (npm, expo, lint, test, dsb.) dijalankan dari dalam folder `BahankuApp` untuk menghindari konflik dengan berkas dokumentasi di root repositori.
-
-## Output Ideal dari Kamu
-
-- Kode TypeScript yang bisa langsung dijalankan dan modular.
-- Tidak mengandung emoji.
-- Komentar bersifat teknis, bukan naratif.
-- Jika ada bagian yang belum jelas, tambahkan komentar seperti:
-
-```ts
-// TODO: klarifikasi bagian ini (Bahasa Indonesia)
+### Custom Hook
+Hook harus return state, loading, error, dan functions. Contoh:
+```typescript
+export const useAuth = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  const login = async (email: string, password: string) => { ... };
+  const logout = async () => { ... };
+  
+  return { user, loading, login, logout };
+};
 ```
+
+### Component
+Component harus TypeScript dengan proper Props interface. Contoh:
+```typescript
+interface ProductCardProps {
+  product: Product;
+  onPress: () => void;
+}
+
+export const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) => {
+  return (
+    <TouchableOpacity onPress={onPress}>
+      <Text>{product.name}</Text>
+      <Text>{formatCurrency(product.price)}</Text>
+    </TouchableOpacity>
+  );
+};
+```
+
+### Store (Zustand)
+Store harus pakai persist middleware untuk AsyncStorage. Contoh:
+```typescript
+export const useCartStore = create<CartState>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      addItem: (product, qty) => { ... },
+      clearCart: () => set({ items: [] }),
+    }),
+    {
+      name: 'cart-storage',
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
+);
+```
+
+## Hal yang Wajib
+
+- Tampilkan EmptyState component jika data kosong
+- Tampilkan loading indicator saat fetch data
+- Error message dalam Bahasa Indonesia
+- Validasi form dengan zod
+- Disable button saat submit (prevent double submit)
+- Gunakan FlatList untuk list panjang
+- Debounce search input 300ms
+- Format harga dengan `formatCurrency()` dari `libs/currency.ts`
+- Import dengan alias `@/` (contoh: `import { theme } from '@/theme'`)
+
+## Git Convention
+
+Branch: `feature/<nama>` atau `fix/<bug>`
+Commit: `feat: deskripsi` atau `fix: deskripsi` (Bahasa Indonesia)
+PR harus include: deskripsi, checklist, screenshot UI (jika ada), langkah testing
+
+Reviewer wajib: Pangeran
+
+## Output yang Diharapkan
+
+- Kode TypeScript yang bisa langsung jalan
+- Tidak ada emoji di kode
+- Komentar teknis bukan naratif
+- Jika ada yang tidak jelas, tulis `// TODO: klarifikasi [hal yang tidak jelas]`
+
+## Troubleshooting Umum
+
+Path alias error → cek `tsconfig.json` sudah ada `paths: { "@/*": ["src/*"] }`
+Supabase session tidak persist → pastikan auth config pakai `storage: AsyncStorage`
+AsyncStorage type error → install `@types/react-native-async-storage__async-storage`
+
+---
+
+## Command Terminal untuk PowerShell Windows
+
+User menggunakan PowerShell Windows sebagai shell default.
+
+### Aturan Navigasi Folder
+
+SELALU pastikan user berada di folder `BahankuApp` sebelum menjalankan command instalasi atau build.
+
+JANGAN langsung jalankan command instalasi tanpa navigasi ke folder yang benar.
+
+**Format Command PowerShell:**
+```powershell
+# BENAR - Untuk PowerShell
+cd BahankuApp
+npm install
+
+# ATAU dengan semicolon
+cd BahankuApp; npm install
+
+# SALAH - Jangan gunakan && di PowerShell
+cd BahankuApp && npm install  # ❌ SALAH
+```
+
+### Template Instruksi yang Benar
+
+Sebelum memberikan command instalasi atau build:
+
+1. Pastikan working directory dengan menyebutkan: "Pastikan Anda berada di folder `BahankuApp`"
+2. Berikan instruksi navigasi eksplisit jika perlu
+3. Format command harus sesuai PowerShell Windows
+
+Contoh instruksi yang benar:
+
+```
+Jalankan command berikut di PowerShell:
+
+# 1. Pindah ke folder BahankuApp (jika belum)
+cd BahankuApp
+
+# 2. Install dependencies
+npm install --legacy-peer-deps
+
+# 3. Start aplikasi
+npx expo start -c
+```
+
+### Cek Dependency Sebelum Install
+
+Sebelum menyarankan `npm install`, SELALU cek dulu apakah dependency sudah lengkap:
+
+```powershell
+# Cek dependency yang terinstall
+npm ls --depth=0
+
+# Atau simulasi install tanpa benar-benar install
+npm install --dry-run
+```
+
+Jika output clean tanpa error "missing" atau "UNMET DEPENDENCY", berarti tidak perlu install lagi.
+
+---
+
+## Organize UI - Komponen Modular
+
+Saat development berlangsung, pecah UI yang kompleks menjadi komponen-komponen kecil untuk menghindari TSX yang terlalu nested.
+
+Bahkan dalam satu halaman (route), jangan ragu membuat file tambahan yang lebih kecil agar halaman lebih maintainable.
+
+Memecah komponen besar menjadi beberapa file akan sangat membantu ketika user meminta perubahan atau refactor di masa mendatang.
+
+### Panduan Komponen:
+
+- Satu komponen maksimal 200 baris kode
+- Jika JSX sudah nested lebih dari 4 level, pertimbangkan ekstrak jadi komponen baru
+- Simpan komponen terkait dalam folder yang sama (misal: `components/home/` untuk komponen khusus homepage)
+- Gunakan nama file yang deskriptif (misal: `SearchBar.tsx`, `CategoryFilter.tsx`)
+- Export komponen dengan named export agar mudah di-import

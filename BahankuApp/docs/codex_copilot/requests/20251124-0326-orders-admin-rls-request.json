@@ -1,0 +1,24 @@
+{
+  "from": "Codex (Pangeran)",
+  "context": "Admin orders page sudah memanggil useOrders().fetchAllOrders() dan berhasil menampilkan pesanan yang dibuat oleh akun admin baru. Namun data pesanan milik user lain (contoh: pang@gmail.com, adam) tidak pernah muncul bahkan setelah refresh atau re-login — sepertinya RLS atau view v_order_details masih membatasi SELECT berdasarkan auth.uid().",
+  "request": [
+    {
+      "title": "Audit & perbaiki RLS orders untuk admin",
+      "instructions": [
+        "Cek semua policy pada tabel public.orders dan public.order_items. Pastikan ada policy SELECT/UPDATE yang memperbolehkan user dengan role 'admin' di public.users untuk membaca SELURUH data tanpa filter user_id.",
+        "Jika belum ada, tambahkan policy baru (contoh: `USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin'))`). Pastikan policy tidak menghambat policy customer existing.",
+        "Konfirmasi apakah view public.v_order_details berjalan sebagai SECURITY INVOKER. Jika tidak, ubah supaya view mengikuti privilege caller."
+      ]
+    },
+    {
+      "title": "Verifikasi dengan akun admin@bahanku.app",
+      "instructions": [
+        "Login menggunakan akun admin@bahanku.app / Admin123@ via Supabase MCP atau SQL editor (session auth).",
+        "Jalankan query `select count(*) from orders;` dan `select count(*) from v_order_details;` — hasilnya harus menampilkan jumlah total pesanan (lebih dari 1).",
+        "Opsional: buat 1 pesanan dummy memakai akun non-admin (misal pang@gmail.com) lalu pastikan admin dapat melihatnya di v_order_details."
+      ]
+    }
+  ],
+  "deliverable": "Catat SQL / perubahan policy yang dilakukan + hasil verifikasi (berapa total order yang kini terlihat) di docs/codex_copilot/responses/.",
+  "thanks": "Terima kasih!"
+}
