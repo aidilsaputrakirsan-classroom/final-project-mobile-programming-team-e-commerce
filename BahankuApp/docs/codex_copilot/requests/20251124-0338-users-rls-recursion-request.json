@@ -1,0 +1,24 @@
+{
+  "from": "Codex (Pangeran)",
+  "context": "Setelah policy `Admin can view all users` ditambahkan, aplikasi gagal memuat data dengan error Postgres 42P17 (infinite recursion in policy for relation `users`). Ini terjadi saat supabase.from('users') dipanggil (loadUserProfile, fetchAllOrders, dsb). Kita perlu solusi yang tetap mengizinkan admin membaca semua row users tanpa memicu recursion.",
+  "request": [
+    {
+      "title": "Perbaiki policy users agar tidak recursion",
+      "instructions": [
+        "Implementasikan pendekatan yang tidak melakukan subquery langsung ke tabel users di dalam policy (ini penyebab recursion). Saran: buat function helper `public.is_admin()` (SECURITY DEFINER, search_path public) yang membaca tabel users berdasarkan auth.uid() dan mengembalikan boolean.",
+        "Update policy `Admin can view all users` untuk menggunakan helper tersebut: `USING (public.is_admin())`. Pastikan helper mem-bypass RLS sehingga tidak memicu recursion.",
+        "Pastikan policy lain (users_select_own, dll) tetap ada."
+      ]
+    },
+    {
+      "title": "Verifikasi end-to-end",
+      "instructions": [
+        "Login sebagai admin@bahanku.app via Supabase MCP/session dan jalankan query `select count(*) from users;` untuk memastikan tidak recursion dan data terbaca penuh.",
+        "Jalankan query `select count(*) from v_order_details;` untuk memastikan admin bisa melihat semua orders (17+).",
+        "Login sebagai user biasa (pang@gmail.com) untuk memastikan mereka tetap hanya melihat row sendiri di users."
+      ]
+    }
+  ],
+  "deliverable": "Tuliskan script function/policy final dan hasil verifikasi di docs/codex_copilot/responses/.",
+  "thanks": "Makasih!"
+}
