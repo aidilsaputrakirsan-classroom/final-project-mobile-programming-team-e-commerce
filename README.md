@@ -1140,7 +1140,7 @@ SOFTWARE.
 
 ## 👨‍💻 Tim Pengembang
 
-**BahanKu** dikembangkan oleh tim mahasiswa Program Studi Teknik Informatika sebagai Final Project Mobile Programming.
+**BahanKu** dikembangkan oleh tim mahasiswa Program Studi Sistem Informasi sebagai Final Project Mobile Programming.
 
 ### Core Team
 
@@ -1158,7 +1158,7 @@ SOFTWARE.
 
 ## 📞 Kontak & Support
 
-- **Email:** support@bahanku.app
+- **Email:** 10231073@student.itk.ac.id
 - **GitHub Issues:** [Report Bug](https://github.com/aidilsaputrakirsan-classroom/final-project-mobile-programming-team-e-commerce/issues)
 - **Documentation:** [BahanKu Docs](https://github.com/aidilsaputrakirsan-classroom/final-project-mobile-programming-team-e-commerce/tree/main/BahankuApp/docs)
 
