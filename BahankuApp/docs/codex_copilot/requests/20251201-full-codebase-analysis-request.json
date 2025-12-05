@@ -1,0 +1,119 @@
+{
+  "from": "Pangeran (PBS) + Copilot",
+  "to": "Codex (Claude 3.5 Sonnet)",
+  "date": "2025-12-01",
+  "priority": "High",
+  "context": "Proyek BahanKu (React Native + Expo Router + Supabase) sudah menyelesaikan Phase 1-4 dan recent UI improvements (Order ID formatting, Order Detail redesign). Kami butuh analisis akurat status codebase sebelum Sprint 3 (Admin CRUD Produk) untuk mengidentifikasi blockers dan incomplete tasks.",
+  "instructions": [
+    {
+      "step": 1,
+      "title": "Scan Codebase Structure",
+      "details": [
+        "Baca seluruh folder app/, src/ di BahankuApp workspace",
+        "Identify semua file .tsx, .ts yang sudah ada",
+        "List components, hooks, stores, services yang sudah implemented",
+        "Check missing atau incomplete implementations",
+        "Verify file structure sesuai dengan AGENTS.md guidelines"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Analisis Per Phase",
+      "details": [
+        "Phase 1 (Setup): package.json dependencies, tsconfig.json path alias, env variables",
+        "Phase 2 (Konfigurasi): theme/index.ts, types/, router setup",
+        "Phase 3 (Autentikasi): supabase.client.ts, useAuth hook, auth screens, protected routes",
+        "Phase 4 (Produk): useProducts hook, home page, product detail, ProductCard, search & filter",
+        "Recent: orderId.ts utility, order detail page, OrderCard, filter chips"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Identify Missing & Incomplete Tasks",
+      "details": [
+        "List semua files/tasks dari Task_Assignment_BahanKu.md yang belum dimulai",
+        "Flag tasks yang incomplete atau broken",
+        "Identify dependencies yang blocking Sprint 3",
+        "Check apakah ada TypeScript errors atau runtime issues"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Test Status & Code Quality",
+      "details": [
+        "Check apakah ada __tests__/ atau .test.ts files",
+        "Identify testing coverage (minimal/none/partial)",
+        "Mental lint check: unused imports, dead code, warnings",
+        "Verify consistency dengan AGENTS.md guidelines (TS strict, naming, comments, Indonesian UI text)"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Documentation Check",
+      "details": [
+        "Review docs/Development_Checklist_BahanKu.md - apakah akurat dengan real status?",
+        "Review docs/Task_Assignment_BahanKu.md - apakah tasks clear dan up-to-date?",
+        "Check README.md - apakah sudah updated?",
+        "Review prd/ folder - Requirements_BahanKu.md, Implementation_Plan_BahanKu.md, Design_Document_BahanKu.md"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Sprint 3 Readiness Assessment",
+      "details": [
+        "Check apakah image upload service (src/services/image.ts) sudah ada atau perlu dibuat",
+        "Verify useProducts hook - apakah sudah ada updateProduct(), deleteProduct() methods?",
+        "Check useAuth hook - apakah ada role checking (admin vs user)?",
+        "Verify Supabase Storage - apakah sudah configured?",
+        "Check admin layout (app/admin/_layout.tsx) - apakah router guard ada?"
+      ]
+    }
+  ],
+  "deliverables": {
+    "format": "Markdown comprehensive report",
+    "sections": [
+      {
+        "title": "OVERALL STATUS",
+        "content": "% completion per phase, blockers, tech debt, critical issues"
+      },
+      {
+        "title": "PHASE BREAKDOWN",
+        "content": "Detailed status dengan ✅/⚠️/❌ untuk setiap phase dan sub-task"
+      },
+      {
+        "title": "IMPLEMENTED COMPONENTS INVENTORY",
+        "content": "List semua components/hooks/services yang sudah jadi, file paths, status"
+      },
+      {
+        "title": "MISSING COMPONENTS (needed for Sprint 3)",
+        "content": "Files/tasks yang belum ada, priority, estimated effort"
+      },
+      {
+        "title": "SPRINT 3 READINESS",
+        "content": "Pre-requisites check ✅/⚠️/❌, blockers, recommended task order"
+      },
+      {
+        "title": "CRITICAL ISSUES (Must Fix)",
+        "content": "🔴 Blockers dengan impact & solution, 🟡 Warnings, 🟢 Nice-to-have"
+      },
+      {
+        "title": "UPDATED DOCUMENTATION",
+        "content": "Provide updated versions ready to replace: Development_Checklist_BahanKu.md, Task_Assignment_BahanKu.md (mark completed)"
+      },
+      {
+        "title": "CODE QUALITY FINDINGS",
+        "content": "Linting issues, type errors, style inconsistencies, missing error handling"
+      }
+    ]
+  },
+  "important_notes": [
+    "Be thorough: scan semua file, jangan skip atau assume",
+    "Be specific: jangan vague, beri line numbers untuk issues, file paths lengkap",
+    "Be honest: jika ada major gaps atau incomplete implementations, report as-is",
+    "Be actionable: setiap recommendation harus konkret dan actionable untuk Sprint 3",
+    "Reference AGENTS.md: check consistency dengan guidelines (TS strict, Indonesian text, max 30 lines functions, etc)",
+    "Cross-reference: correlate findings dengan prd/ documents untuk identify gaps"
+  ],
+  "response_location": "docs/codex_copilot/responses/20251201-full-codebase-analysis-response.md",
+  "expected_turnaround": "Urgent - needed before Sprint 3 kickoff"
+}
