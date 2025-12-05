@@ -1149,7 +1149,7 @@ SOFTWARE.
 
 ### Acknowledgments
 
-- **Dosen Pembimbing:** [Nama Dosen]
+- **Dosen Pembimbing:** Aidil Saputra Kirsan
 - **Supabase Team** — Untuk BaaS platform yang powerful
 - **Expo Team** — Untuk React Native framework yang amazing
 - **Lucide Icons** — Untuk icon library yang clean
