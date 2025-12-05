@@ -1,5 +1,11 @@
 # BahanKu — E-Commerce Bahan Dapur Mobile App
 
+![Expo Router](https://img.shields.io/badge/Expo_Router-3.x-1C1E24?style=flat&logo=expo)
+![React Native](https://img.shields.io/badge/React_Native-0.81.5-61DAFB?style=flat&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat&logo=typescript&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3FCF8E?style=flat&logo=supabase&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+
 ![BahanKu Logo](docs/img/logo.png)
 
 **BahanKu** adalah aplikasi mobile e-commerce bahan dapur berbasis **React Native + Expo** dengan **TypeScript** dan **Supabase** sebagai backend. Aplikasi ini memungkinkan customer untuk membeli bahan dapur secara online, melihat inspirasi resep, dan mengelola pesanan. Admin dapat mengelola produk, kategori, diskon, dan status pesanan melalui panel admin yang terintegrasi.
@@ -15,8 +21,8 @@
 - [Konfigurasi](#-konfigurasi)
 - [Role & Permissions](#-role--permissions)
 - [Fitur Berdasarkan Role](#-fitur-berdasarkan-role)
-- [Struktur Database](#-struktur-database)
 - [Screenshot](#-screenshot)
+- [Struktur Database](#-struktur-database)
 - [Penggunaan](#-penggunaan)
 - [Testing](#-testing)
 - [Deployment](#-deployment)
@@ -29,15 +35,15 @@
 ## ✨ Fitur Utama
 
 ### Fitur Customer
-- ✅ **Autentikasi Pengguna** — Register, login (email/password), dan Google Sign-In via Supabase Auth
-- ✅ **Katalog Produk** — Browse produk dengan filter kategori, pencarian real-time, dan infinite scroll
+- ✅ **Autentikasi Pengguna** — Register, login email/password, dan auto session restore (Google Sign-In akan ditambahkan setelah konfigurasi OAuth)
+- ✅ **Katalog Produk** — Browse produk dengan filter kategori, pencarian debounced, dan filter lanjutan melalui modal
 - ✅ **Detail Produk** — Gambar produk, deskripsi lengkap, harga, stok, dan kategori
 - ✅ **Keranjang Belanja** — Tambah/hapus produk, update quantity, persist ke AsyncStorage
 - ✅ **Checkout & Order** — Modal checkout dengan input alamat pengiriman, validasi stok otomatis
 - ✅ **Riwayat Pesanan** — Lihat semua pesanan dengan status timeline (Diproses → Dikirim → Selesai)
 - ✅ **Resep Masakan** — Browse resep dengan bahan yang terhubung ke produk
 - ✅ **Favorit Resep** — Simpan resep favorit untuk akses cepat
-- ✅ **Profil Pengguna** — Kelola data pengguna dan logout
+- ✅ **Profil Pengguna** — Lihat profil, menu admin, dan logout (edit profil & dark mode coming soon)
 
 ### Fitur Admin
 - ✅ **Kelola Produk** — CRUD produk dengan upload gambar ke Supabase Storage
@@ -52,7 +58,7 @@
 - ✅ **Search & Filter** — Pencarian produk dengan debounce 300ms, filter kategori
 - ✅ **Empty State** — UI informatif saat data kosong
 - ✅ **Loading Skeleton** — Skeleton loader untuk better UX
-- ✅ **Toast Notifications** — Feedback real-time untuk aksi user
+- ✅ **Alert Feedback** — Setiap aksi penting menampilkan konfirmasi/error dialog
 - ✅ **Responsive Design** — Optimized untuk Android, kompatibel dengan iOS
 
 ---
@@ -73,7 +79,7 @@
 - **Database:** PostgreSQL (relational database)
 - **Authentication:** Supabase Auth (email/password + OAuth Google)
 - **Storage:** Supabase Storage untuk gambar produk dan resep
-- **Real-time:** Supabase Realtime untuk update status pesanan (opsional)
+- **Real-time:** Supabase Realtime (opsional, belum diaktifkan di build saat ini)
 - **RPC Functions:** `fn_validate_stock`, `fn_create_order`
 - **Database Views:** `v_order_details` untuk query optimization
 
@@ -557,7 +563,7 @@ BahanKu menggunakan 2 role utama:
 |-------|----------|-------|
 | **Autentikasi** |
 | Register & Login | ✅ | ✅ |
-| Google Sign-In | ✅ | ✅ |
+| Google Sign-In | ⏳ | ⏳ |
 | Logout | ✅ | ✅ |
 | **Produk** |
 | Browse Katalog Produk | ✅ | ✅ |
@@ -590,8 +596,94 @@ BahanKu menggunakan 2 role utama:
 | CRUD Diskon | ❌ | ✅ |
 | **Profil** |
 | Lihat Profil Sendiri | ✅ | ✅ |
-| Update Profil | ✅ | ✅ |
+| Update Profil | ⏳ | ⏳ |
 | Akses Menu Admin | ❌ | ✅ |
+
+> Keterangan: ✅ fitur tersedia, ❌ tidak tersedia, ⏳ dalam pengembangan.
+
+---
+
+## 📸 Screenshot
+
+### Customer Flow
+
+#### 1. Authentication
+<div style="display: flex; gap: 10px;">
+  <img src="docs/img/01-login.png" width="200" alt="Login Screen" />
+  <img src="docs/img/02-register.png" width="200" alt="Register Screen" />
+</div>
+
+**Login Screen** — Email/password login dengan opsi Google Sign-In  
+**Register Screen** — Form registrasi dengan validasi real-time
+
+#### 2. Home & Product Catalog
+<div style="display: flex; gap: 10px;">
+  <img src="docs/img/03-home.png" width="200" alt="Home Screen" />
+  <img src="docs/img/04-product-detail.png" width="200" alt="Product Detail" />
+</div>
+
+**Home Screen** — Promo banner, kategori filter, dan product grid  
+**Product Detail** — Gambar produk, deskripsi, harga, stok, dan quantity stepper
+
+#### 3. Cart & Checkout
+<div style="display: flex; gap: 10px;">
+  <img src="docs/img/05-cart.png" width="200" alt="Cart Screen" />
+  <img src="docs/img/06-checkout-modal.png" width="200" alt="Checkout Modal" />
+</div>
+
+**Cart Screen** — Daftar item dengan checkbox select all, update qty, hapus  
+**Checkout Modal** — Input alamat pengiriman dan konfirmasi pesanan
+
+#### 4. Orders
+<div style="display: flex; gap: 10px;">
+  <img src="docs/img/07-orders.png" width="200" alt="Orders List" />
+  <img src="docs/img/08-order-detail.png" width="200" alt="Order Detail" />
+</div>
+
+**Orders List** — Riwayat pesanan dengan filter status dan search  
+**Order Detail** — Timeline status, daftar item, total harga, dan action buttons
+
+#### 5. Recipes & Favorites
+<div style="display: flex; gap: 10px;">
+  <img src="docs/img/09-recipes.png" width="200" alt="Recipes List" />
+  <img src="docs/img/10-recipe-detail.png" width="200" alt="Recipe Detail" />
+  <img src="docs/img/11-favorites.png" width="200" alt="Favorites List" />
+</div>
+
+**Recipes List** — Grid resep dengan tombol favorit  
+**Recipe Detail** — Bahan, langkah memasak, dan link ke produk  
+**Favorites List** — Resep yang disimpan user
+
+#### 6. Profile
+<div style="display: flex; gap: 10px;">
+  <img src="docs/img/12-profile.png" width="200" alt="Profile Screen" />
+</div>
+
+**Profile Screen** — Data user, menu admin (jika role admin), dan logout
+
+### Admin Flow
+
+#### 7. Admin Products
+<div style="display: flex; gap: 10px;">
+  <img src="docs/img/13-admin-products.png" width="200" alt="Admin Products" />
+  <img src="docs/img/14-admin-product-form.png" width="200" alt="Product Form" />
+</div>
+
+**Admin Products** — List produk dengan search, filter, dan action menu  
+**Product Form** — Form tambah/edit produk dengan upload image
+
+#### 8. Admin Orders & Management
+<div style="display: flex; gap: 10px;">
+  <img src="docs/img/15-admin-orders.png" width="200" alt="Admin Orders" />
+  <img src="docs/img/16-admin-categories.png" width="200" alt="Admin Categories" />
+  <img src="docs/img/17-admin-discounts.png" width="200" alt="Admin Discounts" />
+  <img src="docs/img/18-admin-recipes.png" width="200" alt="Admin Recipes" />
+</div>
+
+**Admin Orders** — Kelola semua pesanan dengan filter dan update status  
+**Admin Categories** — CRUD kategori produk  
+**Admin Discounts** — Manajemen diskon aktif/tidak aktif  
+**Admin Recipes** — CRUD resep masakan
 
 ---
 
@@ -748,90 +840,6 @@ SELECT
 FROM v_order_details
 WHERE user_id = 'current-user-id';
 ```
-
----
-
-## 📸 Screenshot
-
-### Customer Flow
-
-#### 1. Authentication
-<div style="display: flex; gap: 10px;">
-  <img src="docs/img/01-login.png" width="200" alt="Login Screen" />
-  <img src="docs/img/02-register.png" width="200" alt="Register Screen" />
-</div>
-
-**Login Screen** — Email/password login dengan opsi Google Sign-In  
-**Register Screen** — Form registrasi dengan validasi real-time
-
-#### 2. Home & Product Catalog
-<div style="display: flex; gap: 10px;">
-  <img src="docs/img/03-home.png" width="200" alt="Home Screen" />
-  <img src="docs/img/04-product-detail.png" width="200" alt="Product Detail" />
-</div>
-
-**Home Screen** — Promo banner, kategori filter, dan product grid  
-**Product Detail** — Gambar produk, deskripsi, harga, stok, dan quantity stepper
-
-#### 3. Cart & Checkout
-<div style="display: flex; gap: 10px;">
-  <img src="docs/img/05-cart.png" width="200" alt="Cart Screen" />
-  <img src="docs/img/06-checkout-modal.png" width="200" alt="Checkout Modal" />
-</div>
-
-**Cart Screen** — Daftar item dengan checkbox select all, update qty, hapus  
-**Checkout Modal** — Input alamat pengiriman dan konfirmasi pesanan
-
-#### 4. Orders
-<div style="display: flex; gap: 10px;">
-  <img src="docs/img/07-orders.png" width="200" alt="Orders List" />
-  <img src="docs/img/08-order-detail.png" width="200" alt="Order Detail" />
-</div>
-
-**Orders List** — Riwayat pesanan dengan filter status dan search  
-**Order Detail** — Timeline status, daftar item, total harga, dan action buttons
-
-#### 5. Recipes & Favorites
-<div style="display: flex; gap: 10px;">
-  <img src="docs/img/09-recipes.png" width="200" alt="Recipes List" />
-  <img src="docs/img/10-recipe-detail.png" width="200" alt="Recipe Detail" />
-  <img src="docs/img/11-favorites.png" width="200" alt="Favorites List" />
-</div>
-
-**Recipes List** — Grid resep dengan tombol favorit  
-**Recipe Detail** — Bahan, langkah memasak, dan link ke produk  
-**Favorites List** — Resep yang disimpan user
-
-#### 6. Profile
-<div style="display: flex; gap: 10px;">
-  <img src="docs/img/12-profile.png" width="200" alt="Profile Screen" />
-</div>
-
-**Profile Screen** — Data user, menu admin (jika role admin), dan logout
-
-### Admin Flow
-
-#### 7. Admin Products
-<div style="display: flex; gap: 10px;">
-  <img src="docs/img/13-admin-products.png" width="200" alt="Admin Products" />
-  <img src="docs/img/14-admin-product-form.png" width="200" alt="Product Form" />
-</div>
-
-**Admin Products** — List produk dengan search, filter, dan action menu  
-**Product Form** — Form tambah/edit produk dengan upload image
-
-#### 8. Admin Orders & Management
-<div style="display: flex; gap: 10px;">
-  <img src="docs/img/15-admin-orders.png" width="200" alt="Admin Orders" />
-  <img src="docs/img/16-admin-categories.png" width="200" alt="Admin Categories" />
-  <img src="docs/img/17-admin-discounts.png" width="200" alt="Admin Discounts" />
-  <img src="docs/img/18-admin-recipes.png" width="200" alt="Admin Recipes" />
-</div>
-
-**Admin Orders** — Kelola semua pesanan dengan filter dan update status  
-**Admin Categories** — CRUD kategori produk  
-**Admin Discounts** — Manajemen diskon aktif/tidak aktif  
-**Admin Recipes** — CRUD resep masakan
 
 ---
 
