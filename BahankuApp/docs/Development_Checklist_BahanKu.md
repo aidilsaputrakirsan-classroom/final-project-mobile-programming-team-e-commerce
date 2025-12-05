@@ -100,10 +100,10 @@ Penanggung jawab: (Pangeran) | (Adam)
 
 ## 10. Testing dan Polishing
 
-- [Belum Dibuat] Periksa semua navigasi antar halaman (Adam)
-- [Belum Dibuat] Uji login, register, dan logout (Pangeran)
-- [Belum Dibuat] Uji checkout dan status pesanan (Pangeran)
-- [Belum Dibuat] Uji CRUD produk (admin) (Adam)
-- [Belum Dibuat] Uji resep dan favorit (Adam)
-- [Belum Dibuat] Lint dan typecheck final (Shared)
-- [Belum Dibuat] Buat dokumentasi README final (Shared)
+- [Telah Dibuat] Periksa semua navigasi antar halaman (Adam)
+- [Telah Dibuat] Uji login, register, dan logout (Pangeran)
+- [Telah Dibuat] Uji checkout dan status pesanan (Pangeran)
+- [Telah Dibuat] Uji CRUD produk (admin) (Adam)
+- [Telah Dibuat] Uji resep dan favorit (Adam)
+- [Telah Dibuat] Lint dan typecheck final (Shared)
+- [Telah Dibuat] Buat dokumentasi README final (Adam) — Comprehensive README with all sections: Features, Tech Stack, Installation, Configuration, Role-Based Access, Database Structure, Screenshots placeholders, Testing, Deployment, Contributing, License
