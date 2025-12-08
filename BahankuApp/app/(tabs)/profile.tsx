@@ -11,6 +11,8 @@ import {
   ChefHat,
   Tag,
   Percent,
+  Moon,
+  Sun,
 } from 'lucide-react-native';
 import React from 'react';
 import {
@@ -20,11 +22,13 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/hooks/useAuth';
-import { theme } from '@/theme';
+import { theme, useAppTheme } from '@/theme';
+import { useUIStore } from '@/store/ui.store';
 
 // Fungsi untuk mendapatkan initials dari email atau nama
 function getInitials(email?: string, name?: string): string {
@@ -58,11 +62,16 @@ function MenuItem({
   badgeText,
   isDestructive,
 }: MenuItemProps) {
+  const theme = useAppTheme();
   return (
     <TouchableOpacity style={styles.menuItem} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.menuItemLeft}>
         {icon}
-        <Text style={[styles.menuItemLabel, isDestructive && styles.destructiveText]}>
+        <Text style={[
+          styles.menuItemLabel, 
+          { color: theme.colors.text },
+          isDestructive && { color: theme.colors.error }
+        ]}>
           {label}
         </Text>
       </View>
@@ -81,6 +90,8 @@ function MenuItem({
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, logout } = useAuth();
+  const theme = useAppTheme();
+  const { isDarkMode, toggleDarkMode } = useUIStore();
 
   const handleLogout = () => {
     Alert.alert('Konfirmasi Logout', 'Apakah Anda yakin ingin keluar dari akun?', [
@@ -104,15 +115,15 @@ export default function ProfileScreen() {
   const isAdmin = user?.role === 'admin';
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.colors.background }]} edges={['top']}>
+      <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]} showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Profil</Text>
+        <View style={[styles.header, { backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.border }]}>
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Profil</Text>
         </View>
 
         {/* Profile Card */}
-        <View style={styles.profileCard}>
+        <View style={[styles.profileCard, { backgroundColor: theme.colors.surface }]}>
           <View style={styles.avatarContainer}>
             <View style={[styles.avatar, isAdmin && styles.adminAvatar]}>
               <Text style={styles.avatarText}>{initials}</Text>
@@ -124,8 +135,8 @@ export default function ProfileScreen() {
             ) : null}
           </View>
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>{displayName}</Text>
-            <Text style={styles.profileEmail}>{user?.email || '-'}</Text>
+            <Text style={[styles.profileName, { color: theme.colors.text }]}>{displayName}</Text>
+            <Text style={[styles.profileEmail, { color: theme.colors.textSecondary }]}>{user?.email || '-'}</Text>
             {isAdmin ? (
               <View style={styles.roleTag}>
                 <Text style={styles.roleTagText}>Admin</Text>
@@ -136,14 +147,14 @@ export default function ProfileScreen() {
 
         {/* Menu Sections */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Aktivitas</Text>
-          <View style={styles.menuCard}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>Aktivitas</Text>
+          <View style={[styles.menuCard, { backgroundColor: theme.colors.surface }]}>
             <MenuItem
               icon={<Package size={20} color={theme.colors.primary} />}
               label="Pesanan Saya"
               onPress={() => router.push('/(tabs)/orders')}
             />
-            <View style={styles.menuDivider} />
+            <View style={[styles.menuDivider, { backgroundColor: theme.colors.border }]} />
             <MenuItem
               icon={<Heart size={20} color={theme.colors.error} />}
               label="Resep Favorit"
@@ -155,32 +166,32 @@ export default function ProfileScreen() {
         {/* Admin Section */}
         {isAdmin ? (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Admin</Text>
-            <View style={styles.menuCard}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>Admin</Text>
+            <View style={[styles.menuCard, { backgroundColor: theme.colors.surface }]}>
               <MenuItem
                 icon={<ShoppingBag size={20} color={theme.colors.primary} />}
                 label="Kelola Produk"
                 onPress={() => router.push('/admin/products')}
               />
-              <View style={styles.menuDivider} />
+              <View style={[styles.menuDivider, { backgroundColor: theme.colors.border }]} />
               <MenuItem
                 icon={<Shield size={20} color={theme.colors.secondary} />}
                 label="Kelola Pesanan"
                 onPress={() => router.push('/admin/orders')}
               />
-              <View style={styles.menuDivider} />
+              <View style={[styles.menuDivider, { backgroundColor: theme.colors.border }]} />
               <MenuItem
                 icon={<ChefHat size={20} color={theme.colors.warning} />}
                 label="Kelola Resep"
                 onPress={() => router.push('/admin/recipes')}
               />
-              <View style={styles.menuDivider} />
+              <View style={[styles.menuDivider, { backgroundColor: theme.colors.border }]} />
               <MenuItem
                 icon={<Tag size={20} color={theme.colors.info} />}
                 label="Kelola Kategori"
                 onPress={() => router.push('/admin/categories')}
               />
-              <View style={styles.menuDivider} />
+              <View style={[styles.menuDivider, { backgroundColor: theme.colors.border }]} />
               <MenuItem
                 icon={<Percent size={20} color={theme.colors.error} />}
                 label="Kelola Diskon"
@@ -191,25 +202,33 @@ export default function ProfileScreen() {
         ) : null}
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Pengaturan</Text>
-          <View style={styles.menuCard}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>Pengaturan</Text>
+          <View style={[styles.menuCard, { backgroundColor: theme.colors.surface }]}>
             <MenuItem
               icon={<Settings size={20} color={theme.colors.textSecondary} />}
               label="Pengaturan Akun"
-              onPress={() => handleComingSoon('Pengaturan Akun')}
+              onPress={() => router.push('/profile/edit')}
             />
-            <View style={styles.menuDivider} />
+            <View style={[styles.menuDivider, { backgroundColor: theme.colors.border }]} />
+            <View style={styles.menuItem}>
+                <View style={styles.menuItemLeft}>
+                  {isDarkMode ? <Moon size={20} color={theme.colors.primary} /> : <Sun size={20} color={theme.colors.warning} />}
+                  <Text style={[styles.menuItemLabel, { color: theme.colors.text }]}>Mode Gelap</Text>
+                </View>
+                <Switch value={isDarkMode} onValueChange={toggleDarkMode} />
+             </View>
+            <View style={[styles.menuDivider, { backgroundColor: theme.colors.border }]} />
             <MenuItem
               icon={<HelpCircle size={20} color={theme.colors.textSecondary} />}
               label="Bantuan & FAQ"
-              onPress={() => handleComingSoon('Bantuan')}
+              onPress={() => router.push('/profile/help')}
             />
           </View>
         </View>
 
         {/* Logout */}
         <View style={styles.section}>
-          <View style={styles.menuCard}>
+          <View style={[styles.menuCard, { backgroundColor: theme.colors.surface }]}>
             <MenuItem
               icon={<LogOut size={20} color={theme.colors.error} />}
               label="Keluar"
@@ -220,7 +239,7 @@ export default function ProfileScreen() {
         </View>
 
         {/* App Version */}
-        <Text style={styles.versionText}>BahanKu v1.0.0</Text>
+        <Text style={[styles.versionText, { color: theme.colors.textSecondary }]}>BahanKu v1.0.0</Text>
       </ScrollView>
     </SafeAreaView>
   );

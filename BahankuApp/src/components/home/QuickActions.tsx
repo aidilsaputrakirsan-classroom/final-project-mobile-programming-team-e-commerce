@@ -16,7 +16,7 @@ const ACTIONS: ActionItem[] = [
   { icon: BookOpen, label: 'Resep', color: '#F97316', route: '/recipes' },
   { icon: Zap, label: 'Flash', color: '#EAB308' },
   { icon: Star, label: 'Best', color: '#3B82F6' },
-  { icon: Percent, label: 'Diskon', color: '#EF4444' },
+  { icon: Percent, label: 'Diskon', color: '#EF4444', route: '/discounts' },
 ];
 
 export const QuickActions = () => {

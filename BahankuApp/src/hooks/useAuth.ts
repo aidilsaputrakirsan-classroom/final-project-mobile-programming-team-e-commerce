@@ -266,6 +266,30 @@ export const useAuth = () => {
     }
   };
 
+  const updateProfile = async (name: string) => {
+    try {
+      setLoading(true);
+      if (!user) throw new Error('User not found');
+
+      const { error } = await supabase
+        .from('users')
+        .update({ name })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setUser({ ...user, name }, supabaseUser);
+      Alert.alert('Sukses', 'Profil berhasil diperbarui');
+      return true;
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     user,
     supabaseUser,
@@ -276,5 +300,6 @@ export const useAuth = () => {
     register,
     signInWithGoogle,
     logout,
+    updateProfile,
   };
 };

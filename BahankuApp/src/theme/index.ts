@@ -1,3 +1,5 @@
+import { useUIStore } from '@/store/ui.store';
+
 export const theme = {
   colors: {
     primary: '#10b981', // emerald-500
@@ -73,3 +75,22 @@ export const theme = {
 };
 
 export type Theme = typeof theme;
+
+export const useAppTheme = () => {
+  const { isDarkMode } = useUIStore();
+
+  const colors = {
+    ...theme.colors,
+    background: isDarkMode ? theme.colors.backgroundDark : theme.colors.background,
+    surface: isDarkMode ? theme.colors.surfaceDark : theme.colors.surface,
+    text: isDarkMode ? theme.colors.textDark : theme.colors.text,
+    textSecondary: isDarkMode ? '#9ca3af' : theme.colors.textSecondary,
+    border: isDarkMode ? theme.colors.borderDark : theme.colors.border,
+  };
+
+  return {
+    ...theme,
+    colors,
+    isDarkMode,
+  };
+};

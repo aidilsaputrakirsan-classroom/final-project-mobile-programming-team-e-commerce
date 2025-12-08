@@ -13,7 +13,7 @@ import {
 import { theme } from '@/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const BANNER_WIDTH = SCREEN_WIDTH - theme.spacing.lg * 2;
+const BANNER_WIDTH = SCREEN_WIDTH;
 
 interface BannerItem {
   id: string;
@@ -117,18 +117,20 @@ export const PromoBanner = () => {
   };
 
   const renderBannerItem = ({ item }: { item: BannerItem }) => (
-    <View style={[styles.banner, { backgroundColor: item.backgroundColor }]}>
-      <View style={styles.bannerContent}>
-        <Text style={styles.bannerTitle}>{item.title}</Text>
-        <Text style={styles.bannerSubtitle}>{item.subtitle}</Text>
-        <TouchableOpacity
-          style={styles.bannerButton}
-          onPress={() => handleBannerPress(item.route)}
-        >
-          <Text style={[styles.bannerButtonText, { color: item.backgroundColor }]}>
-            {item.buttonText}
-          </Text>
-        </TouchableOpacity>
+    <View style={styles.bannerContainer}>
+      <View style={[styles.banner, { backgroundColor: item.backgroundColor }]}>
+        <View style={styles.bannerContent}>
+          <Text style={styles.bannerTitle}>{item.title}</Text>
+          <Text style={styles.bannerSubtitle}>{item.subtitle}</Text>
+          <TouchableOpacity
+            style={styles.bannerButton}
+            onPress={() => handleBannerPress(item.route)}
+          >
+            <Text style={[styles.bannerButtonText, { color: item.backgroundColor }]}>
+              {item.buttonText}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -162,9 +164,7 @@ export const PromoBanner = () => {
         onScrollEndDrag={handleScrollEnd}
         onMomentumScrollEnd={handleScrollEnd}
         scrollEventThrottle={16}
-        snapToInterval={BANNER_WIDTH}
         decelerationRate="fast"
-        contentContainerStyle={styles.flatListContent}
         getItemLayout={(_, index) => ({
           length: BANNER_WIDTH,
           offset: BANNER_WIDTH * index,
@@ -180,11 +180,12 @@ const styles = StyleSheet.create({
   container: {
     marginTop: theme.spacing.md,
   },
-  flatListContent: {
+  bannerContainer: {
+    width: BANNER_WIDTH,
     paddingHorizontal: theme.spacing.lg,
   },
   banner: {
-    width: BANNER_WIDTH,
+    width: '100%',
     borderRadius: 16,
     padding: theme.spacing.lg,
     overflow: 'hidden',
