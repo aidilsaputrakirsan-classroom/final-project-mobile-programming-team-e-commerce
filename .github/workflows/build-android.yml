@@ -48,6 +48,9 @@ jobs:
         working-directory: ./BahankuApp
         run: npm ci
 
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
       - name: Create .env file
         working-directory: ./BahankuApp
         run: |
