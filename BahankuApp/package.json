@@ -10,7 +10,8 @@
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier --check .",
-    "format:fix": "prettier --write ."
+    "format:fix": "prettier --write .",
+    "vercel-build": "expo export"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
