@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="36b41d17-ee39-4765-a087-3933b6190ff3" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/BahankuApp/.env" beforeDir="false" afterPath="$PROJECT_DIR$/BahankuApp/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/BahankuApp/app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/_expo/static/js/android/index-5b4752fb4cbc706a019e080460bc2a84.hbc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/017bc6ba3fc25503e5eb5e53826d48a8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/02bc1fa7c0313217bde2d65ccbff40c9" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/069d99eb1fa6712c0b9034a58c6b57dd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/0747a1317bbe9c6fc340b889ef8ab3ae" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/0a328cd9c1afd0afe8e3b1ec5165b1b4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/1190ab078c57159f4245a328118fcd9a" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/19eeb73b9593a38f8e9f418337fc7d10" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/20e71bdf79e3a97bf55fd9e164041578" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/286d67d3f74808a60a78d3ebf1a5fb57" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/35ba0eaec5a4f5ed12ca16fabeae451d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/3cd68ccdb8938e3711da2e8831b85493" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/412dd9275b6b48ad28f5e3d81bb1f626" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/4403c6117ec30c859bc95d70ce4a71d3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/61ca7e64b7d605716c57706cef640b9a" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/778ffc9fe8773a878e9c30a6304784de" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/78c625386b4d0690b421eb0fc78f7b9c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/ab19f4cbc543357183a20571f68380a3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/aff2c65b39a296d4f7e96d0f58169170" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/c3273c9e5321f20d1e42c2efae2578c4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/c79c3606a1cf168006ad3979763c7e0c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/d1ea1496f9057eb392d5bbf3732a61b7" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/d84e297c3b3e49a614248143d53e40ca" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/d8b800c443b8972542883e0b9de2bdc6" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/assets/d8e7601e3df962f83c62371ac14964d8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/dist/metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/BahankuApp/dist/metadata.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/BahankuApp/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BahankuApp/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/BahankuApp/package.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="39YL7SDWTftI0ejOg9iDIdlaVwZ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;AndroidSdkUpdater&quot;
+  }
+}</component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="36b41d17-ee39-4765-a087-3933b6190ff3" name="Changes" comment="" />
+      <created>1770867890519</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1770867890519</updated>
+    </task>
+    <servers />
+  </component>
+</project>

@@ -60,7 +60,7 @@ export const RecommendationsSection = ({
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 0,
+    marginTop: theme.spacing.md,
     backgroundColor: '#FFFFFF',
     paddingVertical: theme.spacing.md,
   },
@@ -78,11 +78,11 @@ const styles = StyleSheet.create({
   },
   recommendationScroll: {
     paddingHorizontal: theme.spacing.lg,
-    gap: theme.spacing.md,
   },
   recommendationCard: {
     width: 120,
     alignItems: 'center',
+    marginRight: theme.spacing.md,
   },
   recommendationImageContainer: {
     width: 100,

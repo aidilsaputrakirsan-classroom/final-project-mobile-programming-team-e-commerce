@@ -13,7 +13,9 @@ import {
 import { theme } from '@/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const BANNER_GAP = theme.spacing.sm;
 const BANNER_WIDTH = SCREEN_WIDTH - theme.spacing.lg * 2;
+const SNAP_INTERVAL = BANNER_WIDTH + BANNER_GAP;
 
 interface BannerItem {
   id: string;
@@ -96,7 +98,7 @@ export const PromoBanner = () => {
 
   const handleScroll = useCallback((event: { nativeEvent: { contentOffset: { x: number } } }) => {
     const scrollPosition = event.nativeEvent.contentOffset.x;
-    const index = Math.round(scrollPosition / BANNER_WIDTH);
+    const index = Math.round(scrollPosition / SNAP_INTERVAL);
     if (index !== activeIndex && index >= 0 && index < BANNER_DATA.length) {
       setActiveIndex(index);
     }
@@ -155,19 +157,18 @@ export const PromoBanner = () => {
         renderItem={renderBannerItem}
         keyExtractor={(item) => item.id}
         horizontal
-        pagingEnabled
         showsHorizontalScrollIndicator={false}
         onScroll={handleScroll}
         onScrollBeginDrag={handleScrollBegin}
         onScrollEndDrag={handleScrollEnd}
         onMomentumScrollEnd={handleScrollEnd}
         scrollEventThrottle={16}
-        snapToInterval={BANNER_WIDTH}
+        snapToInterval={SNAP_INTERVAL}
         decelerationRate="fast"
         contentContainerStyle={styles.flatListContent}
         getItemLayout={(_, index) => ({
-          length: BANNER_WIDTH,
-          offset: BANNER_WIDTH * index,
+          length: SNAP_INTERVAL,
+          offset: SNAP_INTERVAL * index,
           index,
         })}
       />
@@ -185,6 +186,7 @@ const styles = StyleSheet.create({
   },
   banner: {
     width: BANNER_WIDTH,
+    marginRight: BANNER_GAP,
     borderRadius: 16,
     padding: theme.spacing.lg,
     overflow: 'hidden',
